@@ -1,18 +1,17 @@
 import Editor from '@monaco-editor/react'
 import mermaid from 'mermaid'
+import { Inter } from 'next/font/google'
 import Head from 'next/head'
 import { useEffect, useRef, useState, MouseEvent } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const mermaidRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef(null)
   const [panelStyles, setPanelStyles] = useState({ transform: 'translate(0px, 0px) scale(1)' })
   const [content, setContent] = useState('')
-  const [mouseDown, setMouseDown] = useState(false)
-  const [pageX, setPageX] = useState(0)
-  const [pageY, setPageY] = useState(0)
-  const [scale, setScale] = useState(1)
 
   const editorOptions = {
     minimap: { enabled: false },
@@ -43,12 +42,12 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <div className='flex h-screen flex-col overflow-y-hidden'>
+      <div className={`${inter.className} flex h-screen flex-col overflow-y-hidden`}>
         <div className='sticky top-0 z-10 w-full border-b px-2 py-1'>
-          <div>Mermaid Live Editor</div>
+          <div className='font-semibold'>Mermaid Live Editor</div>
         </div>
         <main className='grid flex-1 grid-cols-12'>
-          <div className='col-span-4 border-r'>
+          <div className='col-span-4 border-r md:col-span-3'>
             <div>
               <Editor
                 height='100vh'
@@ -58,7 +57,7 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className='col-span-8 h-full'>
+          <div className='col-span-8 h-full md:col-span-9'>
             <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
               <TransformComponent contentClass='bg-dotted tr-comp' wrapperClass='tr-wrapper'>
                 <div className='flex h-full w-full items-center justify-center'>
