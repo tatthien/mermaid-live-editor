@@ -1,0 +1,31 @@
+{
+  "name": "@tatthien/config",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "echo 1"
+  },
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "eslint-preset.js",
+    "prettier-preset.js"
+  ],
+  "devDependencies": {
+    "eslint": "^8.37.0",
+    "prettier": "^2.8.7",
+    "typescript": "^5.0.3"
+  },
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint-config-next": "^13.2.4",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier-plugin-tailwindcss": "^0.2.6"
+  }
+}
