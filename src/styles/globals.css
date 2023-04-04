@@ -8,7 +8,7 @@
 }
 
 .bg-dotted {
-  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 1.5C0 2.32843 0.671573 3 1.5 3C2.32843 3 3 2.32843 3 1.5C3 0.671573 2.32843 0 1.5 0C0.671573 0 0 0.671573 0 1.5Z' fill='%23E0E0E0'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 1C0 1.55229 0.447715 2 1 2C1.55229 2 2 1.55229 2 1C2 0.447715 1.55229 0 1 0C0.447715 0 0 0.447715 0 1Z' fill='%23E0E0E0'/%3E%3C/svg%3E");
 }
 
 .tr-wrapper {
