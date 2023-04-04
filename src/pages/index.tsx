@@ -5,11 +5,9 @@ import RefreshIcon from '@/components/icons/refresh'
 import Editor from '@monaco-editor/react'
 import mermaid from 'mermaid'
 import type { MermaidConfig } from 'mermaid'
-import { BlockList } from 'net'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
-import { abort } from 'process'
-import { useEffect, useRef, useState, MouseEvent, MouseEventHandler, ReactNode } from 'react'
+import { useEffect, useRef, useState, MouseEventHandler, ReactNode } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -67,7 +65,7 @@ export default function Home() {
   function btnDownloadSVGHandler() {
     if (previewRef.current) {
       const svg = previewRef.current.querySelector('svg')
-      const blob = new Blob([svg?.outerHTML], { type: 'image/svg+xml;charset=utf-8' })
+      const blob = new Blob([String(svg?.outerHTML)], { type: 'image/svg+xml;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const downloadLink = document.createElement('a')
       downloadLink.href = url
