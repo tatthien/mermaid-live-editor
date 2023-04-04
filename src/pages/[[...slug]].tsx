@@ -27,11 +27,11 @@ export default function Home(props: { diagram: string; shareId: string }) {
   const previewRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef(null)
   const [content, setContent] = useState('')
-  const [originalContent, setOriginalContent] = useState('')
+  const [originalContent, setOriginalContent] = useState(props.diagram)
   const [hideSidebar, setHideSidebar] = useState(false)
   const [disableShareButton, setDisableShareButton] = useState(true)
   const [sharing, setSharing] = useState(false)
-  const [shareId, setShareId] = useState('')
+  const [shareId, setShareId] = useState(props.shareId)
   const [copied, setCopied] = useState(false)
 
   const editorOptions = {
@@ -52,19 +52,15 @@ export default function Home(props: { diagram: string; shareId: string }) {
 
   useEffect(() => {
     setContent(props.diagram)
-    setOriginalContent(props.diagram)
-    setShareId(props.shareId)
-    // @TODO: duplicate, find solution
-    mermaid.contentLoaded()
     if (previewRef.current) {
       previewRef.current.removeAttribute('data-processed')
     }
-  }, [props.diagram, props.shareId])
+  }, [])
 
   useEffect(() => {
-    if (previewRef.current && content) {
-      // @TODO: duplicate, find solution
-      mermaid.contentLoaded()
+    if (content === '') return
+    mermaid.contentLoaded()
+    if (previewRef.current) {
       previewRef.current.removeAttribute('data-processed')
     }
   }, [content])
