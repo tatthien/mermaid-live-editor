@@ -1,25 +1,38 @@
 import ActionButton from '@/components/action-button'
+import CheckIcon from '@/components/icons/check'
 import DownloadIcon from '@/components/icons/download'
 import LayoutFullIcon from '@/components/icons/layout-full'
 import LayoutSidebarIcon from '@/components/icons/layout-sidebar'
+import LinkIcon from '@/components/icons/link'
 import MinusIcon from '@/components/icons/minus'
 import PlusIcon from '@/components/icons/plus'
 import RefreshIcon from '@/components/icons/refresh'
+import ShareIcon from '@/components/icons/share'
 import Editor from '@monaco-editor/react'
+import { createClient } from '@supabase/supabase-js'
+import isEqual from 'lodash/isEqual'
 import mermaid from 'mermaid'
 import type { MermaidConfig } from 'mermaid'
+import { GetServerSidePropsContext } from 'next'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
-import { useEffect, useRef, useState, MouseEventHandler, ReactNode } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+export default function Home(props: { diagram: string; shareId: string }) {
+  const router = useRouter()
   const previewRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef(null)
   const [content, setContent] = useState('')
+  const [originalContent, setOriginalContent] = useState('')
   const [hideSidebar, setHideSidebar] = useState(false)
+  const [disableShareButton, setDisableShareButton] = useState(true)
+  const [sharing, setSharing] = useState(false)
+  const [shareId, setShareId] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const editorOptions = {
     minimap: { enabled: false },
@@ -38,11 +51,29 @@ export default function Home() {
   } as MermaidConfig)
 
   useEffect(() => {
+    setContent(props.diagram)
+    setOriginalContent(props.diagram)
+    setShareId(props.shareId)
+    // @TODO: duplicate, find solution
+    mermaid.contentLoaded()
+    previewRef.current.removeAttribute('data-processed')
+  }, [])
+
+  useEffect(() => {
     if (previewRef.current && content) {
+      // @TODO: duplicate, find solution
       mermaid.contentLoaded()
       previewRef.current.removeAttribute('data-processed')
     }
   }, [content])
+
+  useEffect(() => {
+    if (content === '' || isEqual(content, originalContent)) {
+      setDisableShareButton(true)
+    } else {
+      setDisableShareButton(false)
+    }
+  }, [content, originalContent])
 
   function handleEditorChange(value: any) {
     setContent(value)
@@ -64,6 +95,38 @@ export default function Home() {
     }
   }
 
+  async function btnShareHandler() {
+    try {
+      setSharing(true)
+      const res = await fetch(`/api/share`, {
+        method: 'POST',
+        body: JSON.stringify({
+          content: content,
+        }),
+      })
+      const { id } = await res.json()
+      setShareId(id)
+      setOriginalContent(content)
+      router.push(`/${id}`)
+    } catch (err) {
+      console.error(err)
+    }
+    setSharing(false)
+  }
+
+  async function btnCopyShareUrlHandler() {
+    try {
+      const { asPath } = router
+      navigator.clipboard.writeText(process.env.NEXT_PUBLIC_BASE_URL + asPath)
+      setCopied(true)
+      setTimeout(() => {
+        setCopied(false)
+      }, 500)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   return (
     <>
       <Head>
@@ -72,7 +135,25 @@ export default function Home() {
       <div className={`${inter.className} flex h-screen flex-col`}>
         <div className='sticky top-0 z-10 w-full border-b bg-white px-4 py-1.5'>
           <div className='flex items-center justify-between'>
-            <div className='font-semibold'>Mermaid Live Editor</div>
+            <div className='flex items-center gap-4'>
+              <h1 className='font-medium'>Mermaid Live Editor</h1>
+              <ActionButton
+                onClick={btnShareHandler}
+                icon={<ShareIcon />}
+                displayText
+                text='Share'
+                loading={sharing}
+                disabled={disableShareButton}
+              />
+              {shareId !== '' && (
+                <div
+                  onClick={btnCopyShareUrlHandler}
+                  className='ml-2 flex cursor-pointer items-center gap-1 text-sm text-slate-500 hover:text-slate-900'>
+                  <span className='truncate'>.../{shareId}</span>
+                  {copied ? <CheckIcon /> : <LinkIcon />}
+                </div>
+              )}
+            </div>
             <div>
               <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
                 <button
@@ -98,6 +179,7 @@ export default function Home() {
             <div>
               <Editor
                 height='calc(100vh - 43px)'
+                defaultValue={content}
                 options={editorOptions}
                 onChange={handleEditorChange}
                 onMount={(editor) => (editorRef.current = editor)}
@@ -122,6 +204,7 @@ export default function Home() {
                     <div className='flex gap-1'>
                       <ActionButton
                         onClick={btnDownloadSVGHandler}
+                        variant='secondary'
                         icon={<DownloadIcon />}
                         displayText={true}
                         text='SVG'
@@ -130,9 +213,24 @@ export default function Home() {
                   </div>
                   <div className='absolute bottom-[1rem] left-[1rem]'>
                     <div className='flex flex-col gap-1'>
-                      <ActionButton onClick={() => zoomIn()} icon={<PlusIcon />} text='Zoom in' />
-                      <ActionButton onClick={() => zoomOut()} icon={<MinusIcon />} text='Zoom out' />
-                      <ActionButton onClick={() => resetTransform()} icon={<RefreshIcon />} text='Reset' />
+                      <ActionButton
+                        onClick={() => zoomIn()}
+                        variant='secondary'
+                        icon={<PlusIcon />}
+                        text='Zoom in'
+                      />
+                      <ActionButton
+                        onClick={() => zoomOut()}
+                        variant='secondary'
+                        icon={<MinusIcon />}
+                        text='Zoom out'
+                      />
+                      <ActionButton
+                        onClick={() => resetTransform()}
+                        variant='secondary'
+                        icon={<RefreshIcon />}
+                        text='Reset'
+                      />
                     </div>
                   </div>
                 </>
@@ -143,4 +241,36 @@ export default function Home() {
       </div>
     </>
   )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { params } = context
+  if (!params?.slug) {
+    return {
+      props: {
+        diagram: `flowchart TD
+  A[Start] --> B{Is it?}
+  B -- Yes --> C[OK]
+  C --> D[Rethink]
+  D --> B
+  B -- No ----> E[End]
+`,
+        shareId: '',
+      },
+    }
+  }
+
+  const client = createClient(String(process.env.SP_PROJECT_URL), String(process.env.SP_ANON_KEY))
+  const { data, error } = await client.from('shares').select('content').eq('share_id', params?.slug)
+  if (error || !data.length) {
+    return {
+      notFound: true,
+    }
+  }
+  return {
+    props: {
+      diagram: data[0].content,
+      shareId: params?.slug,
+    },
+  }
 }
