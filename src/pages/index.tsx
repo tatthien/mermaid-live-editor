@@ -1,3 +1,4 @@
+import ActionButton from '@/components/action-button'
 import DownloadIcon from '@/components/icons/download'
 import LayoutFullIcon from '@/components/icons/layout-full'
 import LayoutSidebarIcon from '@/components/icons/layout-sidebar'
@@ -13,25 +14,6 @@ import { useEffect, useRef, useState, MouseEventHandler, ReactNode } from 'react
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
-
-const ActionButton = (props: {
-  icon: ReactNode
-  text: string
-  displayText?: boolean
-  onClick: MouseEventHandler
-}) => {
-  const displayText = props.displayText ?? false
-  return (
-    <button
-      className={`${
-        displayText ? 'px-1.5 py-1' : 'p-0.5'
-      } inline-flex cursor-pointer items-center justify-center gap-1 rounded border border-slate-200 bg-white text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300 focus:ring-offset-1`}
-      onClick={props.onClick}
-      aria-label={`${props.text} button`}>
-      {props.icon} {displayText && props.text}
-    </button>
-  )
-}
 
 export default function Home() {
   const previewRef = useRef<HTMLDivElement>(null)
@@ -87,8 +69,8 @@ export default function Home() {
       <Head>
         <title>Mermaid Live Editor</title>
       </Head>
-      <div className={`${inter.className} flex h-screen flex-col overflow-y-hidden`}>
-        <div className='sticky top-0 z-10 w-full border-b px-4 py-1.5'>
+      <div className={`${inter.className} flex h-screen flex-col`}>
+        <div className='sticky top-0 z-10 w-full border-b bg-white px-4 py-1.5'>
           <div className='flex items-center justify-between'>
             <div className='font-semibold'>Mermaid Live Editor</div>
             <div>
@@ -115,7 +97,7 @@ export default function Home() {
           <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
             <div>
               <Editor
-                height='100vh'
+                height='calc(100vh - 43px)'
                 options={editorOptions}
                 onChange={handleEditorChange}
                 onMount={(editor) => (editorRef.current = editor)}
@@ -146,7 +128,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  <div className='absolute bottom-[60px] left-[1rem]'>
+                  <div className='absolute bottom-[1rem] left-[1rem]'>
                     <div className='flex flex-col gap-1'>
                       <ActionButton onClick={() => zoomIn()} icon={<PlusIcon />} text='Zoom in' />
                       <ActionButton onClick={() => zoomOut()} icon={<MinusIcon />} text='Zoom out' />
