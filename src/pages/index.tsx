@@ -1,4 +1,6 @@
 import DownloadIcon from '@/components/icons/download'
+import LayoutFullIcon from '@/components/icons/layout-full'
+import LayoutSidebarIcon from '@/components/icons/layout-sidebar'
 import MinusIcon from '@/components/icons/minus'
 import PlusIcon from '@/components/icons/plus'
 import RefreshIcon from '@/components/icons/refresh'
@@ -35,6 +37,7 @@ export default function Home() {
   const previewRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef(null)
   const [content, setContent] = useState('')
+  const [hideSidebar, setHideSidebar] = useState(false)
 
   const editorOptions = {
     minimap: { enabled: false },
@@ -78,14 +81,38 @@ export default function Home() {
       URL.revokeObjectURL(url)
     }
   }
+
   return (
     <>
+      <Head>
+        <title>Mermaid Live Editor</title>
+      </Head>
       <div className={`${inter.className} flex h-screen flex-col overflow-y-hidden`}>
-        <div className='sticky top-0 z-10 w-full border-b px-2 py-1'>
-          <div className='font-semibold'>Mermaid Live Editor</div>
+        <div className='sticky top-0 z-10 w-full border-b px-4 py-1.5'>
+          <div className='flex items-center justify-between'>
+            <div className='font-semibold'>Mermaid Live Editor</div>
+            <div>
+              <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
+                <button
+                  onClick={() => setHideSidebar(false)}
+                  className={`${
+                    hideSidebar === false ? 'text-pink-500' : 'text-slate-400 hover:text-slate-600'
+                  } transition`}>
+                  <LayoutSidebarIcon />
+                </button>
+                <button
+                  onClick={() => setHideSidebar(true)}
+                  className={`${
+                    hideSidebar ? 'text-pink-500' : 'text-slate-400 hover:text-slate-600'
+                  } transition`}>
+                  <LayoutFullIcon />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         <main className='relative grid flex-1 grid-cols-12'>
-          <div className='col-span-4 border-r md:col-span-3'>
+          <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
             <div>
               <Editor
                 height='100vh'
@@ -95,7 +122,10 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className='relative col-span-8 h-full bg-gray-50 md:col-span-9'>
+          <div
+            className={`${
+              hideSidebar ? 'col-span-12' : 'col-span-8 md:col-span-9'
+            } relative h-full bg-gray-50`}>
             <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <>
@@ -106,7 +136,7 @@ export default function Home() {
                       </div>
                     </div>
                   </TransformComponent>
-                  <div className='absolute right-[20px] top-[20px]'>
+                  <div className='absolute right-[1rem] top-[1rem]'>
                     <div className='flex gap-1'>
                       <ActionButton
                         onClick={btnDownloadSVGHandler}
@@ -116,7 +146,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  <div className='absolute bottom-[60px] left-[20px]'>
+                  <div className='absolute bottom-[60px] left-[1rem]'>
                     <div className='flex flex-col gap-1'>
                       <ActionButton onClick={() => zoomIn()} icon={<PlusIcon />} text='Zoom in' />
                       <ActionButton onClick={() => zoomOut()} icon={<MinusIcon />} text='Zoom out' />
