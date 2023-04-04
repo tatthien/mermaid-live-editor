@@ -1,23 +1,34 @@
+import DownloadIcon from '@/components/icons/download'
 import MinusIcon from '@/components/icons/minus'
 import PlusIcon from '@/components/icons/plus'
 import RefreshIcon from '@/components/icons/refresh'
 import Editor from '@monaco-editor/react'
 import mermaid from 'mermaid'
 import type { MermaidConfig } from 'mermaid'
+import { BlockList } from 'net'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
+import { abort } from 'process'
 import { useEffect, useRef, useState, MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const ActionButton = (props: { icon: ReactNode; text: string; onClick: MouseEventHandler }) => {
+const ActionButton = (props: {
+  icon: ReactNode
+  text: string
+  displayText?: boolean
+  onClick: MouseEventHandler
+}) => {
+  const displayText = props.displayText ?? false
   return (
     <button
-      className='inline-flex cursor-pointer items-center justify-center gap-1 rounded border border-slate-200 bg-slate-50 p-0.5 text-sm text-slate-600 shadow-sm transition hover:bg-slate-100 focus:outline-none focus:ring focus:ring-slate-300 focus:ring-offset-1'
+      className={`${
+        displayText ? 'px-1.5 py-1' : 'p-0.5'
+      } inline-flex cursor-pointer items-center justify-center gap-1 rounded border border-slate-200 bg-slate-50 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-100 focus:outline-none focus:ring focus:ring-slate-300 focus:ring-offset-1`}
       onClick={props.onClick}
       aria-label={`${props.text} button`}>
-      {props.icon}
+      {props.icon} {displayText && props.text}
     </button>
   )
 }
@@ -49,12 +60,24 @@ export default function Home() {
     }
   }, [content])
 
-  function handleEditorChange(value) {
+  function handleEditorChange(value: any) {
     setContent(value)
   }
 
   function btnDownloadSVGHandler() {
-    console.log(1)
+    if (previewRef.current) {
+      const svg = previewRef.current.querySelector('svg')
+      const blob = new Blob([svg?.outerHTML], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const downloadLink = document.createElement('a')
+      downloadLink.href = url
+      const date = new Date()
+      downloadLink.download = `mermaid-${date.getTime().toString()}.svg`
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
+      URL.revokeObjectURL(url)
+    }
   }
   return (
     <>
@@ -90,6 +113,16 @@ export default function Home() {
                       </div>
                     </div>
                   </TransformComponent>
+                  <div className='absolute right-[20px] top-[20px]'>
+                    <div className='flex gap-1'>
+                      <ActionButton
+                        onClick={btnDownloadSVGHandler}
+                        icon={<DownloadIcon />}
+                        displayText={true}
+                        text='SVG'
+                      />
+                    </div>
+                  </div>
                   <div className='absolute bottom-[60px] left-[20px]'>
                     <div className='flex flex-col gap-1'>
                       <ActionButton onClick={() => zoomIn()} icon={<PlusIcon />} text='Zoom in' />
