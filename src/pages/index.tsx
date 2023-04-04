@@ -23,7 +23,7 @@ const ActionButton = (props: {
     <button
       className={`${
         displayText ? 'px-1.5 py-1' : 'p-0.5'
-      } inline-flex cursor-pointer items-center justify-center gap-1 rounded border border-slate-200 bg-slate-50 text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-100 focus:outline-none focus:ring focus:ring-slate-300 focus:ring-offset-1`}
+      } inline-flex cursor-pointer items-center justify-center gap-1 rounded border border-slate-200 bg-white text-xs font-medium text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300 focus:ring-offset-1`}
       onClick={props.onClick}
       aria-label={`${props.text} button`}>
       {props.icon} {displayText && props.text}
@@ -39,6 +39,7 @@ export default function Home() {
   const editorOptions = {
     minimap: { enabled: false },
     fontSize: 14,
+    tabSize: 2,
   }
 
   mermaid.initialize({
