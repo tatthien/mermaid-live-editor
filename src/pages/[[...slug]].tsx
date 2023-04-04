@@ -40,7 +40,7 @@ export default function Home(props: { diagram: string; shareId: string }) {
     tabSize: 2,
   }
 
-  mermaid.initialize({
+  mermaid.mermaidAPI.initialize({
     startOnLoad: true,
     securityLevel: 'strict',
     theme: 'neutral',
@@ -52,16 +52,13 @@ export default function Home(props: { diagram: string; shareId: string }) {
 
   useEffect(() => {
     setContent(props.diagram)
-    if (previewRef.current) {
-      previewRef.current.removeAttribute('data-processed')
-    }
   }, [])
 
   useEffect(() => {
-    if (content === '') return
-    mermaid.contentLoaded()
-    if (previewRef.current) {
-      previewRef.current.removeAttribute('data-processed')
+    if (content && previewRef.current) {
+      mermaid.mermaidAPI.render('preview', content).then(({ svg }) => {
+        previewRef.current.innerHTML = svg
+      })
     }
   }, [content])
 
@@ -193,9 +190,7 @@ export default function Home(props: { diagram: string; shareId: string }) {
                 <>
                   <TransformComponent contentClass='bg-dotted tr-comp' wrapperClass='tr-wrapper'>
                     <div className='flex h-full w-full items-center justify-center'>
-                      <div ref={previewRef} className='mermaid'>
-                        {content}
-                      </div>
+                      <div ref={previewRef} key='preview'></div>
                     </div>
                   </TransformComponent>
                   <div className='absolute right-[1rem] top-[1rem]'>
