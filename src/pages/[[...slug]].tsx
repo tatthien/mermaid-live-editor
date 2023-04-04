@@ -56,8 +56,10 @@ export default function Home(props: { diagram: string; shareId: string }) {
     setShareId(props.shareId)
     // @TODO: duplicate, find solution
     mermaid.contentLoaded()
-    previewRef.current.removeAttribute('data-processed')
-  }, [])
+    if (previewRef.current) {
+      previewRef.current.removeAttribute('data-processed')
+    }
+  }, [props.diagram, props.shareId])
 
   useEffect(() => {
     if (previewRef.current && content) {

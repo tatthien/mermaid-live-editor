@@ -7,6 +7,7 @@ importers:
       '@monaco-editor/react': ^4.4.6
       '@supabase/supabase-js': ^2.14.0
       '@tatthien/config': workspace:*
+      '@types/lodash': ^4.14.192
       '@types/node': 18.15.11
       '@types/react': 18.0.32
       '@types/react-dom': 18.0.11
@@ -39,6 +40,7 @@ importers:
       typescript: 5.0.3
     devDependencies:
       '@tatthien/config': link:packages/config
+      '@types/lodash': 4.14.192
       autoprefixer: 10.4.14_postcss@8.4.21
       eslint: 8.37.0
       postcss: 8.4.21
@@ -520,6 +522,10 @@ packages:
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: false
+
+  /@types/lodash/4.14.192:
+    resolution: {integrity: sha512-km+Vyn3BYm5ytMO13k9KTp27O75rbQ0NFw+U//g+PX7VZyjCioXaRFisqSIJRECljcTv73G3i6BpglNGHgUQ5A==}
+    dev: true
 
   /@types/node/18.15.11:
     resolution: {integrity: sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==}

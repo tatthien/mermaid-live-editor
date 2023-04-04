@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@tatthien/config": "workspace:*",
+    "@types/lodash": "^4.14.192",
     "autoprefixer": "^10.4.14",
     "eslint": "8.37.0",
     "postcss": "^8.4.21",
