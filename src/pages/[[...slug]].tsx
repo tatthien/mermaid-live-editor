@@ -57,7 +57,9 @@ export default function Home(props: { diagram: string; shareId: string }) {
   useEffect(() => {
     if (content && previewRef.current) {
       mermaid.mermaidAPI.render('preview', content).then(({ svg }) => {
-        previewRef.current.innerHTML = svg
+        if (previewRef.current !== null) {
+          previewRef.current.innerHTML = svg
+        }
       })
     }
   }, [content])
