@@ -187,10 +187,7 @@ export default function Home(props: { diagram: string; shareId: string }) {
                 </div>
               </div>
             </Allotment.Pane>
-            <div
-              className={`${
-                hideSidebar ? 'col-span-12' : 'col-span-8 md:col-span-9'
-              } relative h-full bg-gray-50`}>
+            <div className='relative h-full bg-gray-50'>
               <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
                 {({ zoomIn, zoomOut, resetTransform }) => (
                   <>
