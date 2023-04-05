@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --focus-border: transparent;
+  --separator-border: transparent;
+}
+
 .transform-panel-wrapper {
   width: 100%;
   height: 100%;

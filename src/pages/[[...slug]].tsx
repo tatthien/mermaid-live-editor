@@ -10,6 +10,7 @@ import RefreshIcon from '@/components/icons/refresh'
 import ShareIcon from '@/components/icons/share'
 import Editor from '@monaco-editor/react'
 import { createClient } from '@supabase/supabase-js'
+import { Allotment } from 'allotment'
 import isEqual from 'lodash/isEqual'
 import mermaid from 'mermaid'
 import type { MermaidConfig } from 'mermaid'
@@ -173,18 +174,20 @@ export default function Home(props: { diagram: string; shareId: string }) {
           </div>
         </div>
         <main className='relative flex-1'>
-          <SplitPane split='vertical' minSize='20%' maxSize='80%' defaultSize='30%'>
-            <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
-              <div>
-                <Editor
-                  height='calc(100vh - 43px)'
-                  defaultValue={content}
-                  options={editorOptions}
-                  onChange={handleEditorChange}
-                  onMount={(editor) => (editorRef.current = editor)}
-                />
+          <Allotment>
+            <Allotment.Pane visible={!hideSidebar} preferredSize='30%' minSize={200}>
+              <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
+                <div>
+                  <Editor
+                    height='calc(100vh - 43px)'
+                    defaultValue={content}
+                    options={editorOptions}
+                    onChange={handleEditorChange}
+                    onMount={(editor) => (editorRef.current = editor)}
+                  />
+                </div>
               </div>
-            </div>
+            </Allotment.Pane>
             <div
               className={`${
                 hideSidebar ? 'col-span-12' : 'col-span-8 md:col-span-9'
@@ -234,7 +237,7 @@ export default function Home(props: { diagram: string; shareId: string }) {
                 )}
               </TransformWrapper>
             </div>
-          </SplitPane>
+          </Allotment>
         </main>
       </div>
     </>
