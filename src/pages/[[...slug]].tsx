@@ -19,7 +19,6 @@ import { Inter } from 'next/font/google'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import SplitPane from 'react-split-pane'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
