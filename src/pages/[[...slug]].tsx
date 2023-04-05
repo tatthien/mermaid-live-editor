@@ -190,7 +190,7 @@ export default function Home(props: { diagram: string; shareId: string }) {
             <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <>
-                  <TransformComponent contentClass='bg-dotted tr-comp' wrapperClass='tr-wrapper'>
+                  <TransformComponent contentClass='tr-comp' wrapperClass='tr-wrapper'>
                     <div className='flex h-full w-full items-center justify-center'>
                       <div ref={previewRef} key='preview'></div>
                     </div>
