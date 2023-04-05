@@ -127,13 +127,13 @@ export default function Home(props: { diagram: string; shareId: string }) {
   return (
     <>
       <Head>
-        <title>Mermaid Live Editor</title>
+        <title>Use Diagram | Visualize your ideas using Mermaid</title>
       </Head>
       <div className={`${inter.className} flex h-screen flex-col`}>
         <div className='sticky top-0 z-10 w-full border-b bg-white px-4 py-1.5'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-4'>
-              <h1 className='font-medium'>Mermaid Live Editor</h1>
+              <h1 className='font-medium'>usediagram.com</h1>
               <ActionButton
                 onClick={btnShareHandler}
                 icon={<ShareIcon />}
