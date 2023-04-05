@@ -18,6 +18,7 @@ import { Inter } from 'next/font/google'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import SplitPane from 'react-split-pane'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -171,67 +172,69 @@ export default function Home(props: { diagram: string; shareId: string }) {
             </div>
           </div>
         </div>
-        <main className='relative grid flex-1 grid-cols-12'>
-          <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
-            <div>
-              <Editor
-                height='calc(100vh - 43px)'
-                defaultValue={content}
-                options={editorOptions}
-                onChange={handleEditorChange}
-                onMount={(editor) => (editorRef.current = editor)}
-              />
+        <main className='relative flex-1'>
+          <SplitPane split='vertical' minSize='20%' maxSize='80%' defaultSize='30%'>
+            <div className={`${hideSidebar ? 'hidden' : 'col-span-4 md:col-span-3'} border-r`}>
+              <div>
+                <Editor
+                  height='calc(100vh - 43px)'
+                  defaultValue={content}
+                  options={editorOptions}
+                  onChange={handleEditorChange}
+                  onMount={(editor) => (editorRef.current = editor)}
+                />
+              </div>
             </div>
-          </div>
-          <div
-            className={`${
-              hideSidebar ? 'col-span-12' : 'col-span-8 md:col-span-9'
-            } relative h-full bg-gray-50`}>
-            <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <>
-                  <TransformComponent contentClass='tr-comp' wrapperClass='tr-wrapper'>
-                    <div className='flex h-full w-full items-center justify-center'>
-                      <div ref={previewRef} key='preview'></div>
+            <div
+              className={`${
+                hideSidebar ? 'col-span-12' : 'col-span-8 md:col-span-9'
+              } relative h-full bg-gray-50`}>
+              <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
+                {({ zoomIn, zoomOut, resetTransform }) => (
+                  <>
+                    <TransformComponent contentClass='tr-comp' wrapperClass='tr-wrapper'>
+                      <div className='flex h-full w-full items-center justify-center'>
+                        <div ref={previewRef} key='preview'></div>
+                      </div>
+                    </TransformComponent>
+                    <div className='absolute right-[1rem] top-[1rem]'>
+                      <div className='flex gap-1'>
+                        <ActionButton
+                          onClick={btnDownloadSVGHandler}
+                          variant='secondary'
+                          icon={<DownloadIcon />}
+                          displayText={true}
+                          text='SVG'
+                        />
+                      </div>
                     </div>
-                  </TransformComponent>
-                  <div className='absolute right-[1rem] top-[1rem]'>
-                    <div className='flex gap-1'>
-                      <ActionButton
-                        onClick={btnDownloadSVGHandler}
-                        variant='secondary'
-                        icon={<DownloadIcon />}
-                        displayText={true}
-                        text='SVG'
-                      />
+                    <div className='absolute bottom-[1rem] left-[1rem]'>
+                      <div className='flex flex-col gap-1'>
+                        <ActionButton
+                          onClick={() => zoomIn()}
+                          variant='secondary'
+                          icon={<PlusIcon />}
+                          text='Zoom in'
+                        />
+                        <ActionButton
+                          onClick={() => zoomOut()}
+                          variant='secondary'
+                          icon={<MinusIcon />}
+                          text='Zoom out'
+                        />
+                        <ActionButton
+                          onClick={() => resetTransform()}
+                          variant='secondary'
+                          icon={<RefreshIcon />}
+                          text='Reset'
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className='absolute bottom-[1rem] left-[1rem]'>
-                    <div className='flex flex-col gap-1'>
-                      <ActionButton
-                        onClick={() => zoomIn()}
-                        variant='secondary'
-                        icon={<PlusIcon />}
-                        text='Zoom in'
-                      />
-                      <ActionButton
-                        onClick={() => zoomOut()}
-                        variant='secondary'
-                        icon={<MinusIcon />}
-                        text='Zoom out'
-                      />
-                      <ActionButton
-                        onClick={() => resetTransform()}
-                        variant='secondary'
-                        icon={<RefreshIcon />}
-                        text='Reset'
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </TransformWrapper>
-          </div>
+                  </>
+                )}
+              </TransformWrapper>
+            </div>
+          </SplitPane>
         </main>
       </div>
     </>
