@@ -1,4 +1,4 @@
-import LoaderIcon from '@/components/icons/loader'
+import LoaderIcon from '@/components/icons/LoaderIcon'
 import type { ReactNode, MouseEventHandler } from 'react'
 
 export const ActionButton = (props: {
