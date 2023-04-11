@@ -35,7 +35,10 @@ export default function Home(props: IHomeProps) {
           <Allotment>
             <Allotment.Pane visible={true} preferredSize='30%' minSize={200}>
               <Sidebar>
-                <Editor content={content} onChange={(value) => setContent(value)} />
+                <Editor
+                  content={content}
+                  onChange={(value: string | undefined) => setContent(String(value))}
+                />
               </Sidebar>
             </Allotment.Pane>
             <Allotment.Pane>

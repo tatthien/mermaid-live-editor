@@ -3,7 +3,7 @@ import { useRef } from 'react'
 
 interface IEditorProps {
   content: string
-  onChange: () => void
+  onChange: (value: string | undefined) => void
 }
 
 export default function Editor({ content, onChange }: IEditorProps) {
