@@ -52,11 +52,11 @@ export default function Preview({ content }: IPreviewProps) {
   }
 
   return (
-    <div className='relative h-full bg-gray-50'>
+    <div className='relative h-full'>
       <TransformWrapper minScale={0.5} centerZoomedOut={true} centerOnInit={true}>
         {({ zoomIn, zoomOut, resetTransform }) => (
           <>
-            <TransformComponent contentClass='tr-comp' wrapperClass='tr-wrapper'>
+            <TransformComponent contentClass='tr-comp bg-dotted' wrapperClass='tr-wrapper'>
               <div className='flex h-full w-full items-center justify-center'>
                 <div ref={previewRef} key='preview'></div>
               </div>
