@@ -1,5 +1,3 @@
-import { useRef } from 'react'
-
 interface ISidebarProps {
   children: JSX.Element
 }

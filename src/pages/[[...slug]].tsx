@@ -2,6 +2,7 @@ import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
+import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { createClient } from '@supabase/supabase-js'
 import { Allotment } from 'allotment'
 import { GetServerSidePropsContext } from 'next'
@@ -19,6 +20,7 @@ interface IHomeProps {
 export default function Home(props: IHomeProps) {
   const [content, setContent] = useState('')
   const [shareId, setShareId] = useState(props.shareId)
+  const { showSidebar } = useGlobalUI()
 
   useEffect(() => {
     setContent(props.diagram)
@@ -33,7 +35,7 @@ export default function Home(props: IHomeProps) {
         <Header shareId={shareId} content={content} onShared={(id) => setShareId(id)} />
         <main className='relative flex-1'>
           <Allotment>
-            <Allotment.Pane visible={true} preferredSize='30%' minSize={200}>
+            <Allotment.Pane visible={showSidebar} preferredSize='30%' minSize={200}>
               <Sidebar>
                 <Editor
                   content={content}

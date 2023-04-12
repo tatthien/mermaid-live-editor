@@ -4,6 +4,7 @@ import LayoutFullIcon from '@/components/icons/LayoutFullIcon'
 import LayoutSidebarIcon from '@/components/icons/LayoutSidebarIcon'
 import LinkIcon from '@/components/icons/LinkIcon'
 import ShareIcon from '@/components/icons/ShareIcon'
+import { useGlobalUI } from '@/hooks/useGlobalUI'
 import cx from 'clsx'
 import isEqual from 'lodash/isEqual'
 import { useRouter } from 'next/router'
@@ -21,7 +22,7 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
   const [sharing, setSharing] = useState(false)
   const [copied, setCopied] = useState(false)
   const [disableShareButton, setDisableShareButton] = useState(true)
-
+  const { showSidebar, setShowSidebar } = useGlobalUI()
   useEffect(() => {
     setDisableShareButton(isEqual(content, originalContent))
   }, [content, originalContent])
@@ -82,10 +83,20 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
         </div>
         <div>
           <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
-            <button className={cx('text-slate-400 transition hover:text-slate-600')}>
+            <button
+              className={cx(
+                showSidebar ? 'text-pink-500 hover:text-pink-500' : 'text-slate-400 hover:text-slate-600',
+                'transition'
+              )}
+              onClick={() => setShowSidebar(true)}>
               <LayoutSidebarIcon />
             </button>
-            <button className={cx('text-slate-400 transition hover:text-slate-600')}>
+            <button
+              className={cx(
+                !showSidebar ? 'text-pink-500 hover:text-pink-500' : 'text-slate-400 hover:text-slate-600',
+                'transition'
+              )}
+              onClick={() => setShowSidebar(false)}>
               <LayoutFullIcon />
             </button>
           </div>
