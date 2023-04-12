@@ -1,12 +1,9 @@
 import ActionButton from '@/components/ActionButton'
-import CheckIcon from '@/components/icons/CheckIcon'
 import LayoutFullIcon from '@/components/icons/LayoutFullIcon'
-import LayoutSidebarIcon from '@/components/icons/LayoutSidebarIcon'
-import LinkIcon from '@/components/icons/LinkIcon'
-import ShareIcon from '@/components/icons/ShareIcon'
 import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
+import { IconShare, IconLink, IconCheck, IconLayoutSidebar } from '@tabler/icons-react'
 import cx from 'clsx'
 import isEqual from 'lodash/isEqual'
 import Link from 'next/link'
@@ -78,7 +75,7 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
           <h1 className='font-medium'>usediagram.com</h1>
           <ActionButton
             onClick={btnShareHandler}
-            icon={<ShareIcon />}
+            icon={<IconShare size={20} />}
             displayText
             text='Share'
             loading={sharing}
@@ -89,7 +86,7 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
               onClick={btnCopyShareUrlHandler}
               className='ml-2 flex cursor-pointer items-center gap-1 text-sm text-slate-500 hover:text-slate-900'>
               <span className='truncate'>.../{shareId}</span>
-              {copied ? <CheckIcon /> : <LinkIcon />}
+              {copied ? <IconCheck size={20} /> : <IconLink size={20} />}
             </div>
           )}
         </div>
@@ -97,15 +94,15 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
           <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
             <button
               className={cx(
-                showSidebar ? 'text-pink-500 hover:text-pink-500' : 'text-slate-400 hover:text-slate-600',
+                showSidebar ? 'text-slate-900 hover:text-slate-900' : 'text-slate-400 hover:text-slate-600',
                 'transition'
               )}
               onClick={() => setShowSidebar(true)}>
-              <LayoutSidebarIcon />
+              <IconLayoutSidebar size={20} />
             </button>
             <button
               className={cx(
-                !showSidebar ? 'text-pink-500 hover:text-pink-500' : 'text-slate-400 hover:text-slate-600',
+                !showSidebar ? 'text-slate-900 hover:text-slate-900' : 'text-slate-400 hover:text-slate-600',
                 'transition'
               )}
               onClick={() => setShowSidebar(false)}>

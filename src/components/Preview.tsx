@@ -1,15 +1,10 @@
 import ActionButton from '@/components/ActionButton'
-import DownloadIcon from '@/components/icons/DownloadIcon'
-import MinusIcon from '@/components/icons/MinusIcon'
-import PlusIcon from '@/components/icons/PlusIcon'
-import RefreshIcon from '@/components/icons/RefreshIcon'
+import { IconDownload, IconMinus, IconPlus, IconRefresh, IconLoader } from '@tabler/icons-react'
 import axios from 'axios'
 import DOMPurify from 'dompurify'
 import plantumlEncoder from 'plantuml-encoder'
 import { useRef, useEffect, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
-
-import LoaderIcon from './icons/LoaderIcon'
 
 interface IPreviewProps {
   content: string
@@ -83,14 +78,14 @@ export default function Preview({ content }: IPreviewProps) {
                 <ActionButton
                   onClick={btnDownloadSVGHandler}
                   variant='secondary'
-                  icon={<DownloadIcon />}
+                  icon={<IconDownload size={20} />}
                   displayText={true}
                   text='SVG'
                 />
                 <ActionButton
                   onClick={btnDownloadPNGHandler}
                   variant='secondary'
-                  icon={<DownloadIcon />}
+                  icon={<IconDownload size={20} />}
                   displayText={true}
                   loading={isDownloadingPng}
                   text='PNG'
@@ -100,7 +95,7 @@ export default function Preview({ content }: IPreviewProps) {
             <div className='absolute left-[1rem] top-[1rem]'>
               {isGeneratingPreview && (
                 <span className='block animate-spin text-slate-500'>
-                  <LoaderIcon />
+                  <IconLoader size={20} />
                 </span>
               )}
             </div>
@@ -109,19 +104,19 @@ export default function Preview({ content }: IPreviewProps) {
                 <ActionButton
                   onClick={() => zoomIn()}
                   variant='secondary'
-                  icon={<PlusIcon />}
+                  icon={<IconPlus size={20} />}
                   text='Zoom in'
                 />
                 <ActionButton
                   onClick={() => zoomOut()}
                   variant='secondary'
-                  icon={<MinusIcon />}
+                  icon={<IconMinus size={20} />}
                   text='Zoom out'
                 />
                 <ActionButton
                   onClick={() => resetTransform()}
                   variant='secondary'
-                  icon={<RefreshIcon />}
+                  icon={<IconRefresh size={20} />}
                   text='Reset'
                 />
               </div>

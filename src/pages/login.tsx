@@ -1,5 +1,5 @@
-import LoaderIcon from '@/components/icons/LoaderIcon'
 import { supabase } from '@/lib/supabase'
+import { IconLoader } from '@tabler/icons-react'
 import cx from 'clsx'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useState } from 'react'
@@ -60,7 +60,7 @@ export default function Login() {
               <>
                 {isLoading && (
                   <span className='animate-spin'>
-                    <LoaderIcon />
+                    <IconLoader size={20} />
                   </span>
                 )}
                 Log in

@@ -1,7 +1,6 @@
 import MonacoEditor from '@monaco-editor/react'
+import { IconLoader } from '@tabler/icons-react'
 import { debounce } from 'lodash'
-
-import LoaderIcon from './icons/LoaderIcon'
 
 interface EditorProps {
   content: string
@@ -26,7 +25,7 @@ export default function Editor({ content, onChange }: EditorProps) {
       defaultValue={content}
       loading={
         <span className='animate-spin text-slate-500'>
-          <LoaderIcon />
+          <IconLoader size={20} />
         </span>
       }
       options={editorOptions}

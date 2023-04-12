@@ -1,6 +1,5 @@
+import { IconLoader } from '@tabler/icons-react'
 import type { ReactNode, MouseEventHandler } from 'react'
-
-import LoaderIcon from './icons/LoaderIcon'
 
 export const ActionButton = (props: {
   icon: ReactNode
@@ -32,7 +31,7 @@ export const ActionButton = (props: {
       disabled={disabled}>
       {props.loading ? (
         <span className='animate-spin'>
-          <LoaderIcon />
+          <IconLoader size={20} />
         </span>
       ) : (
         props.icon
