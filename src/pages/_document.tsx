@@ -1,8 +1,9 @@
 import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
-  const title = 'Use Diagram | Visualize your ideas using Mermaid'
-  const description = 'UseDiagram.com turns your ideas into diagrams. Try usediagram.com today!'
+  const title = 'Use Diagram | Visualize your ideas with PlantUML'
+  const description =
+    'UseDiagram.com turns your ideas into diagrams with a beautiful UI. Try usediagram.com today!'
   return (
     <Html lang='en'>
       <Head>
