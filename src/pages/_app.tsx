@@ -1,3 +1,4 @@
+import AuthProvider from '@/components/AuthProvider'
 import GlobalUIProvider from '@/components/GlobalUIProvider'
 import { Analytics } from '@vercel/analytics/react'
 import 'allotment/dist/style.css'
@@ -13,7 +14,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
       <GlobalUIProvider>
-        <Component {...pageProps} />
+        <AuthProvider>
+          <Component {...pageProps} />
+        </AuthProvider>
       </GlobalUIProvider>
       <Analytics />
     </>

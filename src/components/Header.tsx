@@ -4,9 +4,12 @@ import LayoutFullIcon from '@/components/icons/LayoutFullIcon'
 import LayoutSidebarIcon from '@/components/icons/LayoutSidebarIcon'
 import LinkIcon from '@/components/icons/LinkIcon'
 import ShareIcon from '@/components/icons/ShareIcon'
+import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
+import { supabase } from '@/lib/supabase'
 import cx from 'clsx'
 import isEqual from 'lodash/isEqual'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -23,6 +26,8 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
   const [copied, setCopied] = useState(false)
   const [disableShareButton, setDisableShareButton] = useState(true)
   const { showSidebar, setShowSidebar } = useGlobalUI()
+  const { user } = useAuth()
+
   useEffect(() => {
     setDisableShareButton(isEqual(content, originalContent))
   }, [content, originalContent])
@@ -59,6 +64,13 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
     }
   }
 
+  async function logoutHandler() {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div className='sticky top-0 z-10 w-full border-b bg-white px-4 py-1.5'>
       <div className='flex items-center justify-between'>
@@ -81,7 +93,7 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
             </div>
           )}
         </div>
-        <div>
+        <div className='flex items-center gap-3'>
           <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
             <button
               className={cx(
@@ -100,6 +112,21 @@ export default function Header({ shareId, content, onShared }: IHeaderProps) {
               <LayoutFullIcon />
             </button>
           </div>
+          {user.email ? (
+            <>
+              <span className='text-sm'>{user.email}</span>
+              <Link
+                href='#'
+                onClick={logoutHandler}
+                className='text-sm text-slate-500 hover:text-slate-900 hover:underline'>
+                Logout
+              </Link>
+            </>
+          ) : (
+            <Link href='/login' className='text-sm text-slate-500 hover:text-slate-900 hover:underline'>
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </div>

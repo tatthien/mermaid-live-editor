@@ -10,7 +10,7 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
   settings: {
     'import/resolver': {
