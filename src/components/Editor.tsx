@@ -1,8 +1,7 @@
 import MonacoEditor from '@monaco-editor/react'
 import { debounce } from 'lodash'
-import { useRef } from 'react'
 
-import RefreshIcon from './icons/RefreshIcon'
+import LoaderIcon from './icons/LoaderIcon'
 
 interface EditorProps {
   content: string
@@ -27,7 +26,7 @@ export default function Editor({ content, onChange }: EditorProps) {
       defaultValue={content}
       loading={
         <span className='animate-spin text-slate-500'>
-          <RefreshIcon />
+          <LoaderIcon />
         </span>
       }
       options={editorOptions}
