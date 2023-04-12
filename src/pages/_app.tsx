@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import 'allotment/dist/style.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+import Script from 'next/script'
 
 import '../styles/globals.css'
 

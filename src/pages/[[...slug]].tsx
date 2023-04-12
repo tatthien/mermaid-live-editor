@@ -35,7 +35,7 @@ export default function Home(props: IHomeProps) {
         <Header shareId={shareId} content={content} onShared={(id) => setShareId(id)} />
         <main className='relative flex-1'>
           <Allotment>
-            <Allotment.Pane visible={showSidebar} preferredSize='30%' minSize={200}>
+            <Allotment.Pane visible={showSidebar} preferredSize={450}>
               <Sidebar>
                 <Editor
                   content={content}
@@ -58,12 +58,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!params?.slug) {
     return {
       props: {
-        diagram: `flowchart TD
-  A[Start] --> B{Is it?}
-  B -- Yes --> C[OK]
-  C --> D[Rethink]
-  D --> B
-  B -- No ----> E[End]
+        diagram: `@startuml
+
+Alice -> Bob: How are you?
+Bob --> Alice: I'm good, thanks
+
+@enduml
 `,
         shareId: '',
       },

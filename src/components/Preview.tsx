@@ -3,8 +3,9 @@ import DownloadIcon from '@/components/icons/DownloadIcon'
 import MinusIcon from '@/components/icons/MinusIcon'
 import PlusIcon from '@/components/icons/PlusIcon'
 import RefreshIcon from '@/components/icons/RefreshIcon'
-import mermaid from 'mermaid'
-import type { MermaidConfig } from 'mermaid'
+import axios from 'axios'
+import DOMPurify from 'dompurify'
+import plantumlEncoder from 'plantuml-encoder'
 import { useRef, useEffect } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
@@ -15,23 +16,20 @@ interface IPreviewProps {
 export default function Preview({ content }: IPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
 
-  mermaid.mermaidAPI.initialize({
-    startOnLoad: true,
-    securityLevel: 'strict',
-    theme: 'neutral',
-    flowchart: {
-      useMaxWidth: false,
-    },
-    htmlLabels: true,
-  } as MermaidConfig)
-
   useEffect(() => {
     if (content && previewRef.current) {
-      mermaid.mermaidAPI.render('preview', content).then(({ svg }) => {
-        if (previewRef.current !== null) {
-          previewRef.current.innerHTML = svg
-        }
-      })
+      const encodedUrl = plantumlEncoder.encode(content)
+      axios
+        .get(`http://www.plantuml.com/plantuml/svg/${encodedUrl}`)
+        .then((res) => {
+          const html = DOMPurify.sanitize(res.data)
+          if (previewRef.current !== null) {
+            previewRef.current.innerHTML = html
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
   }, [content])
 
