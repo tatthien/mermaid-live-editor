@@ -46,7 +46,8 @@ export default function Login() {
             />
           </div>
           <div className='mb-4 text-sm text-slate-500'>
-            Log in using magiclink. After logged in, please check your email for the link.
+            Simply enter your email address and we'll send you a magic link that you can use to access your
+            account.
           </div>
           <div>
             <button
