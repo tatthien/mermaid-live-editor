@@ -11,6 +11,7 @@ interface EditorProps {
 
 export default function Editor({ content, onChange }: EditorProps) {
   const editorOptions = {
+    automaticLayout: true,
     minimap: { enabled: false },
     fontSize: 14,
     tabSize: 2,
@@ -31,6 +32,7 @@ export default function Editor({ content, onChange }: EditorProps) {
       }
       options={editorOptions}
       onChange={onEditorChange}
+      defaultLanguage='apex'
     />
   )
 }
