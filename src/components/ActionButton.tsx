@@ -1,4 +1,4 @@
-import LoaderIcon from '@/components/icons/LoaderIcon'
+import RefreshIcon from '@/components/icons/RefreshIcon'
 import type { ReactNode, MouseEventHandler } from 'react'
 
 export const ActionButton = (props: {
@@ -31,7 +31,7 @@ export const ActionButton = (props: {
       disabled={disabled}>
       {props.loading ? (
         <span className='animate animate-spin'>
-          <LoaderIcon />
+          <RefreshIcon />
         </span>
       ) : (
         props.icon
