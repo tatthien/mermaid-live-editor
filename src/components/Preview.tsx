@@ -6,7 +6,7 @@ import RefreshIcon from '@/components/icons/RefreshIcon'
 import axios from 'axios'
 import DOMPurify from 'dompurify'
 import plantumlEncoder from 'plantuml-encoder'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 interface IPreviewProps {
@@ -15,6 +15,7 @@ interface IPreviewProps {
 
 export default function Preview({ content }: IPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
+  const [isDownloadingPng, setIsDownloadingPng] = useState(false)
 
   useEffect(() => {
     if (content && previewRef.current) {
@@ -33,19 +34,32 @@ export default function Preview({ content }: IPreviewProps) {
     }
   }, [content])
 
+  function downloadFile(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob)
+    const downloadLink = document.createElement('a')
+    downloadLink.href = url
+    downloadLink.download = fileName
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+    URL.revokeObjectURL(url)
+  }
+
   function btnDownloadSVGHandler() {
     if (previewRef.current) {
       const svg = previewRef.current.querySelector('svg')
       const blob = new Blob([String(svg?.outerHTML)], { type: 'image/svg+xml;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
-      const downloadLink = document.createElement('a')
-      downloadLink.href = url
-      const date = new Date()
-      downloadLink.download = `mermaid-${date.getTime().toString()}.svg`
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-      document.body.removeChild(downloadLink)
-      URL.revokeObjectURL(url)
+      downloadFile(blob, `plantuml-${new Date().getTime().toString()}.svg`)
+    }
+  }
+
+  async function btnDownloadPNGHandler() {
+    if (previewRef.current) {
+      setIsDownloadingPng(true)
+      const encodedUrl = plantumlEncoder.encode(content)
+      const { data } = await axios.get(`/api/png/${encodedUrl}`, { responseType: 'blob' })
+      downloadFile(data, `plantuml-${new Date().getTime().toString()}.png`)
+      setIsDownloadingPng(false)
     }
   }
 
@@ -60,13 +74,21 @@ export default function Preview({ content }: IPreviewProps) {
               </div>
             </TransformComponent>
             <div className='absolute right-[1rem] top-[1rem]'>
-              <div className='flex gap-1'>
+              <div className='flex gap-2'>
                 <ActionButton
                   onClick={btnDownloadSVGHandler}
                   variant='secondary'
                   icon={<DownloadIcon />}
                   displayText={true}
                   text='SVG'
+                />
+                <ActionButton
+                  onClick={btnDownloadPNGHandler}
+                  variant='secondary'
+                  icon={<DownloadIcon />}
+                  displayText={true}
+                  loading={isDownloadingPng}
+                  text='PNG'
                 />
               </div>
             </div>
