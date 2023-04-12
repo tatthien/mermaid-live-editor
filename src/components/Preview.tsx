@@ -9,6 +9,8 @@ import plantumlEncoder from 'plantuml-encoder'
 import { useRef, useEffect, useState } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
+import LoaderIcon from './icons/LoaderIcon'
+
 interface IPreviewProps {
   content: string
 }
@@ -16,10 +18,12 @@ interface IPreviewProps {
 export default function Preview({ content }: IPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
   const [isDownloadingPng, setIsDownloadingPng] = useState(false)
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
 
   useEffect(() => {
     if (content && previewRef.current) {
       const encodedUrl = plantumlEncoder.encode(content)
+      setIsGeneratingPreview(true)
       axios
         .get(`/api/svg/${encodedUrl}`)
         .then((res) => {
@@ -31,6 +35,7 @@ export default function Preview({ content }: IPreviewProps) {
         .catch((err) => {
           console.log(err)
         })
+        .finally(() => setIsGeneratingPreview(false))
     }
   }, [content])
 
@@ -91,6 +96,13 @@ export default function Preview({ content }: IPreviewProps) {
                   text='PNG'
                 />
               </div>
+            </div>
+            <div className='absolute left-[1rem] top-[1rem]'>
+              {isGeneratingPreview && (
+                <span className='block animate-spin text-slate-500'>
+                  <LoaderIcon />
+                </span>
+              )}
             </div>
             <div className='absolute bottom-[1rem] left-[1rem]'>
               <div className='flex flex-col gap-1'>

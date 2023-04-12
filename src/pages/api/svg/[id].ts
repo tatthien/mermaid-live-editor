@@ -3,6 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
-  const { data } = await axios.get(`http://www.plantuml.com/plantuml/svg/${id}`)
-  res.status(200).json({ data })
+  try {
+    const { data } = await axios.get(`http://www.plantuml.com/plantuml/svg/${id}`)
+    res.status(200).json({ data })
+  } catch (error: any) {
+    res.status(500).json({ message: error.message })
+  }
 }

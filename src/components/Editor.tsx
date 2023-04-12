@@ -26,7 +26,7 @@ export default function Editor({ content, onChange }: EditorProps) {
       height='calc(100vh - 43px)'
       defaultValue={content}
       loading={
-        <span className='animate animate-spin text-slate-600'>
+        <span className='animate-spin text-slate-500'>
           <RefreshIcon />
         </span>
       }
