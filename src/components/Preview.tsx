@@ -20,9 +20,9 @@ export default function Preview({ content }: IPreviewProps) {
     if (content && previewRef.current) {
       const encodedUrl = plantumlEncoder.encode(content)
       axios
-        .get(`http://www.plantuml.com/plantuml/svg/${encodedUrl}`)
+        .get(`/api/svg/${encodedUrl}`)
         .then((res) => {
-          const html = DOMPurify.sanitize(res.data)
+          const html = DOMPurify.sanitize(res.data.data)
           if (previewRef.current !== null) {
             previewRef.current.innerHTML = html
           }
