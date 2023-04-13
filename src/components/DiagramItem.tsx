@@ -30,9 +30,9 @@ export default function DiagramItem({ item }: DiagramItemProps) {
       )}>
       <div className='flex justify-between gap-2'>
         <div className='truncate'>
-          <h2 className='truncate font-medium'>{item.title}</h2>
+          <h2 className='truncate text-sm font-medium'>{item.title}</h2>
           <div className='flex gap-2'>
-            <div className='text-sm text-slate-400'>{format(parseISO(item.created_at), 'MMM dd, yyyy')}</div>
+            <div className='text-xs text-slate-400'>{format(parseISO(item.created_at), 'MMM dd, yyyy')}</div>
           </div>
         </div>
         <img src={`https://usediagram.com/api/png/${encodedUrl}`} className='w-12 shrink-0 rounded border' />

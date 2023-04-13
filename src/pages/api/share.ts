@@ -27,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         share_id: random(10),
         content: body.content,
         diagram_id: body.id,
+        user_id: body.user_id,
       })
       .select('share_id')
 

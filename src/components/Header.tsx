@@ -22,19 +22,13 @@ interface HeaderProps {
 export default function Header({ shareId: shareIdProp, content, showBtnDiagramList }: HeaderProps) {
   showBtnDiagramList = showBtnDiagramList ?? true
   const router = useRouter()
-  const [originalContent, setOriginalContent] = useState(content)
   const [shareId, setShareId] = useState(shareIdProp)
   const [sharing, setSharing] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [disableShareButton, setDisableShareButton] = useState(true)
   const [diagramTitle, setDiagramTitle] = useState('')
   const { showSidebar, setShowSidebar, toggleDiagramList } = useGlobalUI()
   const { user } = useAuth()
   const diagramItem = useSelector((state: any) => state.diagrams.item)
-
-  useEffect(() => {
-    setDisableShareButton(isEqual(content, originalContent))
-  }, [content, originalContent])
 
   useEffect(() => {
     if (diagramItem) {
@@ -51,10 +45,10 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
         body: JSON.stringify({
           content: content,
           id: diagramItem.id,
+          user_id: user.id,
         }),
       })
       const { id } = await res.json()
-      setOriginalContent(content)
       setShareId(id)
     } catch (err) {
       console.error(err)
@@ -139,7 +133,6 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
                 displayText
                 text='Share'
                 loading={sharing}
-                disabled={disableShareButton}
               />
             )}
             {shareId && (

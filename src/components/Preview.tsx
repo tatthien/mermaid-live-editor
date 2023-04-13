@@ -16,7 +16,8 @@ export default function Preview({ content }: IPreviewProps) {
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
 
   useEffect(() => {
-    if (content && previewRef.current) {
+    if (!previewRef.current) return
+    if (content) {
       const encodedUrl = plantumlEncoder.encode(content)
       setIsGeneratingPreview(true)
       axios
@@ -31,6 +32,8 @@ export default function Preview({ content }: IPreviewProps) {
           console.log(err)
         })
         .finally(() => setIsGeneratingPreview(false))
+    } else {
+      previewRef.current.innerHTML = ''
     }
   }, [content])
 

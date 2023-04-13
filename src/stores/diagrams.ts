@@ -11,7 +11,7 @@ const diagramSlice = createSlice({
       state.data = [...action.payload]
     },
     addDiagram: (state: any, action) => {
-      state.data.push(action.payload)
+      state.data.unshift(action.payload)
     },
     setDiagramItem: (state, action) => {
       state.item = { ...action.payload }

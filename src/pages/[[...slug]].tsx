@@ -52,6 +52,7 @@ export default function Home() {
         .eq('id', slug[0])
         .select('*,shares(*)')
         .single()
+      await supabase.from('shares').update({ content: value }).eq('diagram_id', slug[0])
       if (data) {
         dispatch(setDiagramItem(data))
       }
