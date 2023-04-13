@@ -50,7 +50,7 @@ export default function Home() {
         .from('diagrams')
         .update({ content: value })
         .eq('id', slug[0])
-        .select()
+        .select('*,shares(*)')
         .single()
       if (data) {
         dispatch(setDiagramItem(data))
