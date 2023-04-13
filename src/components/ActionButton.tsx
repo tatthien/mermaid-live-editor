@@ -1,4 +1,5 @@
 import { IconLoader } from '@tabler/icons-react'
+import cx from 'clsx'
 import type { ReactNode, MouseEventHandler } from 'react'
 
 export const ActionButton = (props: {
@@ -9,6 +10,7 @@ export const ActionButton = (props: {
   disabled?: boolean
   loading?: boolean
   onClick: MouseEventHandler
+  className?: string
 }) => {
   const displayText = props.displayText ?? false
   const disabled = props.disabled || props.loading
@@ -25,7 +27,7 @@ export const ActionButton = (props: {
 
   return (
     <button
-      className={`${spacingClasses} ${variantClasses} ${disabledClasses} ${commonClasses}`}
+      className={cx(spacingClasses, variantClasses, disabledClasses, commonClasses, props.className)}
       onClick={props.onClick}
       aria-label={`${props.text} button`}
       disabled={disabled}>

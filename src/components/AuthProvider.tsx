@@ -1,6 +1,7 @@
 import { Auth } from '@/contexts/Auth'
 import { supabase } from '@/lib/supabase'
-import { useState } from 'react'
+import Cookie from 'js-cookie'
+import { useState, useEffect } from 'react'
 
 interface AuthProviderProps {
   children: JSX.Element
@@ -8,15 +9,22 @@ interface AuthProviderProps {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState({})
-  supabase.auth.onAuthStateChange((event, session) => {
-    switch (event) {
-      case 'SIGNED_OUT':
-        setUser({})
-        break
-      default:
-        if (session && session.user) setUser(session.user)
-    }
-  })
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      switch (event) {
+        case 'SIGNED_OUT':
+          setUser({})
+          break
+        default: {
+          if (session && session.user) {
+            setUser(session.user)
+            Cookie.set('x-sb-token', session.access_token)
+          }
+        }
+      }
+    })
+  }, [])
 
   const contextValue = {
     user,

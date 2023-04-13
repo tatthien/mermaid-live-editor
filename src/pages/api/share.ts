@@ -15,11 +15,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return
     }
 
+    const { data: shareData } = await client.from('shares').select().eq('diagram_id', body.id)
+    if (shareData && shareData.length) {
+      res.status(204).end()
+      return
+    }
+
     const { data, error } = await client
       .from('shares')
       .insert({
         share_id: random(10),
         content: body.content,
+        diagram_id: body.id,
       })
       .select('share_id')
 

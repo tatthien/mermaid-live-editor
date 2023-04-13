@@ -1,30 +1,62 @@
+import DiagramList from '@/components/DiagramList'
 import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { setDiagramItem } from '@/stores/diagrams'
 import { Allotment } from 'allotment'
+import cx from 'clsx'
 import { GetServerSidePropsContext } from 'next'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const inter = Inter({ subsets: ['latin'] })
 
-interface IHomeProps {
-  diagram: string
-  shareId: string
-}
-
-export default function Home(props: IHomeProps) {
+export default function Home() {
   const [content, setContent] = useState('')
-  const [shareId, setShareId] = useState(props.shareId)
-  const { showSidebar } = useGlobalUI()
+  const [contentId, setContentId] = useState('')
+  const { showSidebar, showDiagramList } = useGlobalUI()
+  const router = useRouter()
+  const { slug } = router.query
+  const dispatch = useDispatch()
+  const diagramItem = useSelector((state: any) => state.diagrams.item)
 
   useEffect(() => {
-    setContent(props.diagram)
-  }, [])
+    if (!router.isReady || !slug) return
+    const fetch = async () => {
+      const { data } = await supabase.from('diagrams').select('*,shares(*)').eq('id', slug[0]).single()
+      dispatch(setDiagramItem(data))
+    }
+    if (slug) {
+      fetch()
+    }
+  }, [router.isReady])
+
+  useEffect(() => {
+    if (diagramItem) {
+      setContent(diagramItem.content)
+      setContentId(diagramItem.id)
+    }
+  }, [diagramItem])
+
+  async function onEditorChange(value: any) {
+    if (slug) {
+      const { data } = await supabase
+        .from('diagrams')
+        .update({ content: value })
+        .eq('id', slug[0])
+        .select()
+        .single()
+      if (data) {
+        dispatch(setDiagramItem(data))
+      }
+    }
+  }
 
   return (
     <>
@@ -32,15 +64,15 @@ export default function Home(props: IHomeProps) {
         <title>Use Diagram | Visualize your ideas using Mermaid</title>
       </Head>
       <div className={`${inter.className} flex h-screen flex-col`}>
-        <Header shareId={shareId} content={content} onShared={(id) => setShareId(id)} />
-        <main className='relative flex-1'>
+        <Header content={content} />
+        <main className='relative flex flex-1'>
+          <div className={cx(showDiagramList ? 'block' : 'hidden', 'w-[260px] border-r px-2 py-3')}>
+            <DiagramList />
+          </div>
           <Allotment>
             <Allotment.Pane visible={showSidebar} preferredSize={450}>
               <Sidebar>
-                <Editor
-                  content={content}
-                  onChange={(value: string | undefined) => setContent(String(value))}
-                />
+                <Editor path={contentId} content={content} onChange={onEditorChange} />
               </Sidebar>
             </Allotment.Pane>
             <Allotment.Pane>
@@ -51,36 +83,4 @@ export default function Home(props: IHomeProps) {
       </div>
     </>
   )
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { params } = context
-  if (!params?.slug) {
-    return {
-      props: {
-        diagram: `@startuml
-
-Alice -> Bob: How are you?
-Bob --> Alice: I'm good, thanks
-
-@enduml
-`,
-        shareId: '',
-      },
-    }
-  }
-
-  const client = createClient(String(process.env.SP_PROJECT_URL), String(process.env.SP_ANON_KEY))
-  const { data, error } = await client.from('shares').select('content').eq('share_id', params?.slug)
-  if (error || !data.length) {
-    return {
-      notFound: true,
-    }
-  }
-  return {
-    props: {
-      diagram: data[0].content,
-      shareId: params?.slug,
-    },
-  }
 }
