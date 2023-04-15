@@ -3,22 +3,31 @@ import { createSlice } from '@reduxjs/toolkit'
 const diagramSlice = createSlice({
   name: 'diagrams',
   initialState: {
-    data: [],
-    item: null,
+    diagrams: {},
+    selectedDiagramId: '',
   },
   reducers: {
     fetchDiagram: (state: any, action) => {
-      state.data = [...action.payload]
+      state.diagrams = { ...action.payload }
     },
     addDiagram: (state: any, action) => {
-      state.data.unshift(action.payload)
+      state.diagrams = {
+        [action.payload.id]: action.payload,
+        ...state.diagrams,
+      }
     },
-    setDiagramItem: (state, action) => {
-      state.item = { ...action.payload }
+    editDiagram: (state: any, action) => {
+      state.diagrams = {
+        ...state.diagrams,
+        [action.payload.id]: action.payload,
+      }
+    },
+    setSelectedDiagramId: (state, action) => {
+      state.selectedDiagramId = action.payload
     },
   },
 })
 
-export const { fetchDiagram, addDiagram, setDiagramItem } = diagramSlice.actions
+export const { fetchDiagram, addDiagram, editDiagram, setSelectedDiagramId } = diagramSlice.actions
 
 export default diagramSlice.reducer

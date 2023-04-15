@@ -10,11 +10,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     const body = JSON.parse(req.body)
 
-    if (body.content === '') {
-      res.status(422).end()
-      return
-    }
-
     const { data: shareData } = await client.from('shares').select().eq('diagram_id', body.id)
     if (shareData && shareData.length) {
       res.status(204).end()
@@ -29,15 +24,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         diagram_id: body.id,
         user_id: body.user_id,
       })
-      .select('share_id')
-
+      .select()
+      .single()
     if (error) {
       res.status(422).json({ ...error })
       return
     }
 
     res.status(200).json({
-      id: data[0].share_id,
+      data,
     })
   }
 }

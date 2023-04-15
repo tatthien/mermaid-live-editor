@@ -1,4 +1,3 @@
-import DiagramList from '@/components/DiagramList'
 import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
@@ -6,7 +5,6 @@ import Sidebar from '@/components/Sidebar'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { createClient } from '@supabase/supabase-js'
 import { Allotment } from 'allotment'
-import cx from 'clsx'
 import { GetServerSidePropsContext } from 'next'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
@@ -19,14 +17,13 @@ interface IHomeProps {
   shareId: string
 }
 
-export default function Home(props: IHomeProps) {
+export default function Home({ shareId, diagram }: IHomeProps) {
   const [content, setContent] = useState('')
-  const [shareId, setShareId] = useState(props.shareId)
   const { showSidebar } = useGlobalUI()
 
   useEffect(() => {
-    setContent(props.diagram)
-  }, [])
+    setContent(diagram)
+  }, [diagram])
 
   return (
     <>
@@ -60,8 +57,11 @@ export default function Home(props: IHomeProps) {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { params } = context
   const shareId = params?.shareId
-  const client = createClient(String(process.env.SP_PROJECT_URL), String(process.env.SP_ANON_KEY))
-  const { data, error } = await client.from('shares').select('*').eq('share_id', shareId)
+  const client = createClient(
+    String(process.env.NEXT_PUBLIC_SP_PROJECT_URL),
+    String(process.env.NEXT_PUBLIC_SP_ANON_KEY)
+  )
+  const { data, error } = await client.from('shares').select('*').eq('share_id', shareId).limit(1)
   if (error || !data.length) {
     return {
       notFound: true,

@@ -19,7 +19,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         default: {
           if (session && session.user) {
             setUser(session.user)
-            Cookie.set('x-sb-token', session.access_token)
           }
         }
       }

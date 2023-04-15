@@ -5,12 +5,12 @@ import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
-import { setDiagramItem } from '@/stores/diagrams'
+import { editDiagram, setSelectedDiagramId } from '@/stores/diagrams'
 import { Allotment } from 'allotment'
 import cx from 'clsx'
-import { GetServerSidePropsContext } from 'next'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
+import { redirect } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,13 +24,18 @@ export default function Home() {
   const router = useRouter()
   const { slug } = router.query
   const dispatch = useDispatch()
-  const diagramItem = useSelector((state: any) => state.diagrams.item)
+  const diagramItem = useSelector((state: any) => state.diagrams.diagrams[state.diagrams.selectedDiagramId])
 
   useEffect(() => {
     if (!router.isReady || !slug) return
     const fetch = async () => {
-      const { data } = await supabase.from('diagrams').select('*,shares(*)').eq('id', slug[0]).single()
-      dispatch(setDiagramItem(data))
+      const { data, error } = await supabase.from('diagrams').select('*,shares(*)').eq('id', slug[0]).single()
+      if (error) {
+        router.push('/404')
+      }
+      if (data) {
+        dispatch(setSelectedDiagramId(data.id))
+      }
     }
     if (slug) {
       fetch()
@@ -54,8 +59,10 @@ export default function Home() {
         .single()
       await supabase.from('shares').update({ content: value }).eq('diagram_id', slug[0])
       if (data) {
-        dispatch(setDiagramItem(data))
+        dispatch(editDiagram(data))
       }
+    } else {
+      setContent(value)
     }
   }
 

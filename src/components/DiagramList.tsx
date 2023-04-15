@@ -1,8 +1,10 @@
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { addDiagram, fetchDiagram } from '@/stores/diagrams'
-import { IconPlus, IconCategory } from '@tabler/icons-react'
+import { diagramArr } from '@/stores/schema'
+import { IconCategory, IconEdit } from '@tabler/icons-react'
 import { useRouter } from 'next/router'
+import { normalize } from 'normalizr'
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -12,7 +14,7 @@ import DiagramItem from './DiagramItem'
 export default function DiagramList() {
   const [isCreating, setIsCreating] = useState(false)
   const { user } = useAuth()
-  const diagrams = useSelector((state: any) => state.diagrams.data)
+  const diagrams = useSelector((state: any) => state.diagrams.diagrams)
   const dispatch = useDispatch()
   const router = useRouter()
 
@@ -22,7 +24,10 @@ export default function DiagramList() {
         .from('diagrams')
         .select('*,shares(*)')
         .order('created_at', { ascending: false })
-      dispatch(fetchDiagram(data))
+
+      const normalizedData = normalize(data, diagramArr)
+
+      dispatch(fetchDiagram(normalizedData.entities.diagrams))
     }
     fetch()
   }, [])
@@ -48,21 +53,11 @@ export default function DiagramList() {
     setIsCreating(false)
   }
 
-  const listDiagrams =
-    diagrams.length === 0 ? (
-      <div className='flex flex-col items-center justify-center py-6  text-center text-slate-500'>
-        <IconCategory size={40} strokeWidth={1.5} />
-        <span className='text-sm'>No diagrams found</span>
-      </div>
-    ) : (
-      diagrams.map((diagram: any) => <DiagramItem item={diagram} key={diagram.id} />)
-    )
-
   return (
     <div>
       <div className='mb-4'>
         <ActionButton
-          icon={<IconPlus size={20} />}
+          icon={<IconEdit size={20} />}
           text='Add new'
           displayText
           onClick={btnAddNewHandler}
@@ -71,7 +66,16 @@ export default function DiagramList() {
           loading={isCreating}
         />
       </div>
-      <div className='h-[calc(100vh-120px)] space-y-2 overflow-y-auto'>{listDiagrams}</div>
+      <div className='h-[calc(100vh-120px)] space-y-2 overflow-y-auto'>
+        {!diagrams ? (
+          <div className='flex flex-col items-center justify-center py-6  text-center text-slate-500'>
+            <IconCategory size={40} strokeWidth={1.5} />
+            <span className='text-sm'>No diagrams found</span>
+          </div>
+        ) : (
+          Object.keys(diagrams).map((k) => <DiagramItem item={diagrams[k]} key={diagrams[k].id} />)
+        )}
+      </div>
     </div>
   )
 }

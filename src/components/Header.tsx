@@ -3,13 +3,17 @@ import LayoutFullIcon from '@/components/icons/LayoutFullIcon'
 import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
-import { setDiagramItem } from '@/stores/diagrams'
-import { IconShare, IconLink, IconCheck, IconLayoutSidebar, IconMenu2 } from '@tabler/icons-react'
+import { editDiagram } from '@/stores/diagrams'
+import {
+  IconShare,
+  IconLink,
+  IconCheck,
+  IconLayoutSidebar,
+  IconMaximize,
+  IconMaximizeOff,
+} from '@tabler/icons-react'
 import cx from 'clsx'
-import { debounce } from 'lodash'
-import isEqual from 'lodash/isEqual'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -21,21 +25,30 @@ interface HeaderProps {
 
 export default function Header({ shareId: shareIdProp, content, showBtnDiagramList }: HeaderProps) {
   showBtnDiagramList = showBtnDiagramList ?? true
-  const router = useRouter()
   const [shareId, setShareId] = useState(shareIdProp)
   const [sharing, setSharing] = useState(false)
+  const [showShareBtn, setShowShareBtn] = useState(false)
   const [copied, setCopied] = useState(false)
   const [diagramTitle, setDiagramTitle] = useState('')
   const { showSidebar, setShowSidebar, toggleDiagramList } = useGlobalUI()
   const { user } = useAuth()
-  const diagramItem = useSelector((state: any) => state.diagrams.item)
+  const diagramItem = useSelector((state: any) => state.diagrams.diagrams[state.diagrams.selectedDiagramId])
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (diagramItem) {
       setDiagramTitle(diagramItem.title)
-      setShareId(diagramItem.shares.length ? diagramItem.shares[0].share_id : '')
+      setShareId(diagramItem.shares ? diagramItem.shares.share_id : '')
     }
   }, [diagramItem])
+
+  useEffect(() => {
+    if (shareId) {
+      setShowShareBtn(false)
+    } else {
+      setShowShareBtn(user.id && diagramItem?.id)
+    }
+  }, [diagramItem, user, shareId])
 
   async function btnShareHandler() {
     try {
@@ -48,8 +61,14 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
           user_id: user.id,
         }),
       })
-      const { id } = await res.json()
-      setShareId(id)
+      const { data } = await res.json()
+      setShareId(data.id)
+      dispatch(
+        editDiagram({
+          ...diagramItem,
+          shares: { ...data },
+        })
+      )
     } catch (err) {
       console.error(err)
     }
@@ -76,19 +95,25 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
   }
 
   async function onChangeDiagramTitle(event: any) {
-    setDiagramTitle(event.target.value)
+    setDiagramTitle(event.currentTarget.textContent)
   }
 
   async function onKeyPressDiagramTitle(event: any) {
-    if (event.charCode === 13) {
-      await supabase
-        .from('diagrams')
-        .update({ title: diagramTitle })
-        .eq('id', diagramItem.id)
-        .select()
-        .single()
+    if (event.keyCode === 13) {
+      event.preventDefault()
+      updateTitle()
       event.target.blur()
     }
+  }
+
+  async function updateTitle() {
+    const { data } = await supabase
+      .from('diagrams')
+      .update({ title: diagramTitle || 'Untitled' })
+      .eq('id', diagramItem.id)
+      .select()
+      .single()
+    dispatch(editDiagram(data))
   }
 
   return (
@@ -98,7 +123,7 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
           {showBtnDiagramList && (
             <span title={user.id ? 'Show diagrams' : 'Log in to save your diagrams'}>
               <ActionButton
-                icon={<IconMenu2 size={20} />}
+                icon={<IconLayoutSidebar size={20} />}
                 text='Show diagram list'
                 variant='secondary'
                 onClick={toggleDiagramList}
@@ -113,20 +138,23 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
             {diagramItem && (
               <>
                 <span className='mr-1'>/</span>
-                <input
-                  type='text'
-                  value={diagramTitle}
-                  onChange={onChangeDiagramTitle}
-                  onKeyPress={onKeyPressDiagramTitle}
-                  className='rounded border border-transparent px-1 text-slate-600 outline-none focus:border-slate-400 focus:ring focus:ring-slate-300'
-                />
+                <span
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                  role='textbox'
+                  onInput={onChangeDiagramTitle}
+                  onKeyDown={onKeyPressDiagramTitle}
+                  onBlur={updateTitle}
+                  className='rounded border border-transparent px-1 text-slate-600 outline-none focus:border-slate-400 focus:ring focus:ring-slate-300'>
+                  {diagramItem.title}
+                </span>
               </>
             )}
           </div>
         </div>
         <div className='flex items-center gap-3'>
           <div className='mr-6 flex items-center gap-2'>
-            {!shareId && (
+            {showShareBtn && (
               <ActionButton
                 onClick={btnShareHandler}
                 icon={<IconShare size={20} />}
@@ -144,25 +172,13 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
               </div>
             )}
           </div>
-          <div className='border-state-600 flex items-center gap-1 rounded-md border px-1 py-1 shadow-sm'>
-            <button
-              className={cx(
-                showSidebar ? 'text-slate-900 hover:text-slate-900' : 'text-slate-400 hover:text-slate-600',
-                'transition'
-              )}
-              onClick={() => setShowSidebar(true)}>
-              <IconLayoutSidebar size={20} />
-            </button>
-            <button
-              className={cx(
-                !showSidebar ? 'text-slate-900 hover:text-slate-900' : 'text-slate-400 hover:text-slate-600',
-                'transition'
-              )}
-              onClick={() => setShowSidebar(false)}>
-              <LayoutFullIcon />
-            </button>
-          </div>
-          {user.email ? (
+          <ActionButton
+            onClick={() => setShowSidebar(!showSidebar)}
+            icon={showSidebar ? <IconMaximize size={20} /> : <IconMaximizeOff size={20} />}
+            text='Toggle editor'
+            variant='secondary'
+          />
+          {user.id ? (
             <>
               <span className='text-sm'>{user.email}</span>
               <Link

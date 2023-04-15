@@ -33,6 +33,7 @@ importers:
       lodash: ^4.17.21
       mermaid: ^10.0.2
       next: 13.2.4
+      normalizr: ^3.6.2
       plantuml-encoder: ^1.4.0
       postcss: ^8.4.21
       prettier: ^2.8.7
@@ -66,6 +67,7 @@ importers:
       lodash: 4.17.21
       mermaid: 10.0.2
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
+      normalizr: 3.6.2
       plantuml-encoder: 1.4.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -3105,6 +3107,10 @@ packages:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /normalizr/3.6.2:
+    resolution: {integrity: sha512-30qCybsBaCBciotorvuOZTCGEg2AXrJfADMT2Kk/lvpIAcipHdK0zc33nNtwKzyfQAqIJXAcqET6YgflYUgsoQ==}
+    dev: false
 
   /object-assign/4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}

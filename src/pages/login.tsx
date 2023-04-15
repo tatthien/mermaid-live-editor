@@ -1,14 +1,13 @@
 import { supabase } from '@/lib/supabase'
 import { IconLoader } from '@tabler/icons-react'
 import cx from 'clsx'
-import { useRouter } from 'next/router'
 import { ChangeEvent, useState } from 'react'
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
-  const router = useRouter()
+  const [successfulMsg, setSuccessfulMsg] = useState('')
 
   async function onSubmit(event: any) {
     event.preventDefault()
@@ -21,10 +20,12 @@ export default function Login() {
     })
     setIsLoading(false)
     if (error) {
-      setError('Opps! Is the email corrects?')
+      setError('🚫 Opps! Is the email corrects?')
+      setTimeout(() => setError(''), 2000)
       return
     }
-    router.push('/')
+    setSuccessfulMsg('✅ Check your email for the magic link')
+    setTimeout(() => setSuccessfulMsg(''), 5000)
   }
   return (
     <div className='flex h-screen flex-col items-center justify-center bg-slate-50'>
@@ -32,6 +33,11 @@ export default function Login() {
       <div className='w-[350px] max-w-[350px] rounded-md border bg-white p-4 shadow-md'>
         {error && (
           <div className='mb-4 rounded-md border border-red-300 bg-red-100 p-2 text-red-600'>{error}</div>
+        )}
+        {successfulMsg && (
+          <div className='mb-4 rounded-md border border-green-300 bg-green-100 p-2 text-green-600'>
+            {successfulMsg}
+          </div>
         )}
         <form onSubmit={onSubmit}>
           <div className='mb-4'>
@@ -63,11 +69,18 @@ export default function Login() {
                     <IconLoader size={20} />
                   </span>
                 )}
-                Log in
+                Get started
               </>
             </button>
           </div>
         </form>
+      </div>
+      <div className='mt-6'>
+        <a
+          href='https://tally.so/r/nG6E5Z'
+          className='text-sm text-slate-600 hover:text-slate-900 hover:underline'>
+          🔐 Request access
+        </a>
       </div>
     </div>
   )

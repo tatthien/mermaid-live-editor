@@ -1,4 +1,4 @@
-import { setDiagramItem } from '@/stores/diagrams'
+import { setSelectedDiagramId } from '@/stores/diagrams'
 import cx from 'clsx'
 import { format, parseISO } from 'date-fns'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ export default function DiagramItem({ item }: DiagramItemProps) {
   const dispatch = useDispatch()
 
   function onClickItem() {
-    dispatch(setDiagramItem(item))
+    dispatch(setSelectedDiagramId(item.id))
   }
   return (
     <Link
