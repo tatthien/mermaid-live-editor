@@ -15,6 +15,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       switch (event) {
         case 'SIGNED_OUT':
           setUser({})
+          window.location.href = '/'
           break
         default: {
           if (session && session.user) {
