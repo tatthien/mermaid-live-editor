@@ -58,7 +58,7 @@ export default function DiagramList() {
       <div className='mb-4'>
         <ActionButton
           icon={<IconEdit size={20} />}
-          text='Add new'
+          text='New diagram'
           displayText
           onClick={btnAddNewHandler}
           variant='secondary'
