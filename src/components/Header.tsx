@@ -166,7 +166,7 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
               <div
                 onClick={btnCopyShareUrlHandler}
                 className='ml-2 flex cursor-pointer items-center gap-1 text-sm text-slate-500 hover:text-slate-900'>
-                <span className='truncate'>.../{shareId}</span>
+                <span className='truncate'>.../s/{shareId}</span>
                 {copied ? <IconCheck size={20} /> : <IconLink size={20} />}
               </div>
             )}
