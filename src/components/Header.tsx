@@ -32,7 +32,7 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
   const [diagramTitle, setDiagramTitle] = useState('')
   const { showSidebar, setShowSidebar, toggleDiagramList } = useGlobalUI()
   const { user } = useAuth()
-  const diagramItem = useSelector((state: any) => state.diagrams.diagrams[state.diagrams.selectedDiagramId])
+  const diagramItem = useSelector((state: any) => state.diagrams.byId[state.diagrams.selectedId])
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -121,15 +121,13 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-4'>
           {showBtnDiagramList && (
-            <span title={user.id ? 'Show diagrams' : 'Log in to save your diagrams'}>
-              <ActionButton
-                icon={<IconLayoutSidebar size={20} />}
-                text='Show diagram list'
-                variant='secondary'
-                onClick={toggleDiagramList}
-                disabled={!user.id}
-              />
-            </span>
+            <ActionButton
+              icon={<IconLayoutSidebar size={20} />}
+              text='Show diagram list'
+              variant='secondary'
+              onClick={toggleDiagramList}
+              disabled={!user.id}
+            />
           )}
           <div className='flex items-center'>
             <h1 className='mr-2 font-medium'>
@@ -160,6 +158,7 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
                 icon={<IconShare size={20} />}
                 displayText
                 text='Share'
+                variant='secondary'
                 loading={sharing}
               />
             )}

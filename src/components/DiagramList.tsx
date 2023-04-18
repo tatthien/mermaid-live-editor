@@ -1,12 +1,12 @@
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-import { addDiagram, fetchDiagram } from '@/stores/diagrams'
+import { addDiagram, setDiagramAllIds, setDiagramById } from '@/stores/diagrams'
 import { diagramArr } from '@/stores/schema'
 import { IconCategory, IconEdit } from '@tabler/icons-react'
 import { useRouter } from 'next/router'
 import { normalize } from 'normalizr'
 import { useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch, shallowEqual } from 'react-redux'
 
 import ActionButton from './ActionButton'
 import DiagramItem from './DiagramItem'
@@ -14,7 +14,7 @@ import DiagramItem from './DiagramItem'
 export default function DiagramList() {
   const [isCreating, setIsCreating] = useState(false)
   const { user } = useAuth()
-  const diagrams = useSelector((state: any) => state.diagrams.diagrams)
+  const diagramIds = useSelector((state: any) => state.diagrams.allIds, shallowEqual)
   const dispatch = useDispatch()
   const router = useRouter()
 
@@ -27,7 +27,8 @@ export default function DiagramList() {
 
       const normalizedData = normalize(data, diagramArr)
 
-      dispatch(fetchDiagram(normalizedData.entities.diagrams))
+      dispatch(setDiagramById(normalizedData.entities.diagrams))
+      dispatch(setDiagramAllIds(normalizedData.result))
     }
     fetch()
   }, [])
@@ -67,13 +68,13 @@ export default function DiagramList() {
         />
       </div>
       <div className='h-[calc(100vh-120px)] space-y-2 overflow-y-auto'>
-        {!diagrams ? (
+        {diagramIds.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-6  text-center text-slate-500'>
             <IconCategory size={40} strokeWidth={1.5} />
             <span className='text-sm'>No diagrams found</span>
           </div>
         ) : (
-          Object.keys(diagrams).map((k) => <DiagramItem item={diagrams[k]} key={diagrams[k].id} />)
+          diagramIds.map((id: string) => <DiagramItem id={id} key={id} />)
         )}
       </div>
     </div>

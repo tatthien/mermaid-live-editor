@@ -24,7 +24,7 @@ export default function Home() {
   const router = useRouter()
   const { slug } = router.query
   const dispatch = useDispatch()
-  const diagramItem = useSelector((state: any) => state.diagrams.diagrams[state.diagrams.selectedDiagramId])
+  const diagramItem = useSelector((state: any) => state.diagrams.byId[state.diagrams.selectedId])
 
   useEffect(() => {
     if (!router.isReady || !slug) return
@@ -48,6 +48,12 @@ export default function Home() {
       setContentId(diagramItem.id)
     }
   }, [diagramItem])
+
+  useEffect(() => {
+    if (slug) {
+      dispatch(setSelectedDiagramId(slug[0]))
+    }
+  }, [slug])
 
   async function onEditorChange(value: any) {
     if (slug) {
@@ -74,7 +80,7 @@ export default function Home() {
       <div className={`${inter.className} flex h-screen flex-col`}>
         <Header content={content} />
         <main className='relative flex flex-1'>
-          <div className={cx(showDiagramList ? 'block' : 'hidden', 'w-[260px] border-r px-2 py-3')}>
+          <div className={cx(showDiagramList ? 'block' : 'hidden', 'w-[280px] border-r px-2 py-3')}>
             <DiagramList />
           </div>
           <Allotment>
