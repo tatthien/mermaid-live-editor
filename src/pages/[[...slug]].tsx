@@ -75,7 +75,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Use Diagram | Visualize your ideas using Mermaid</title>
+        <title>{diagramItem ? diagramItem.title : 'Untitled'} - UseDiagram</title>
       </Head>
       <div className={`${inter.className} flex h-screen flex-col`}>
         <Header content={content} />
