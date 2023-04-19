@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { IconLoader } from '@tabler/icons-react'
 import cx from 'clsx'
+import Link from 'next/link'
 import { ChangeEvent, useState } from 'react'
 
 export default function Login() {
@@ -26,7 +27,9 @@ export default function Login() {
   }
   return (
     <div className='flex h-screen flex-col items-center justify-center bg-slate-50'>
-      <div className='mb-4 text-xl font-medium'>usediagram.com</div>
+      <div className='mb-4 text-xl font-medium'>
+        <Link href='/'>usediagram.com</Link>
+      </div>
       <div className='w-[350px] max-w-[350px] rounded-md border bg-white p-4 shadow-md'>
         {error && (
           <div className='mb-4 rounded-md border border-red-300 bg-red-100 p-2 text-red-600'>{error}</div>
