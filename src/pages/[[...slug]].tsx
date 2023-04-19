@@ -48,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     if (diagramItem) {
       setContent(diagramItem.content)
-      setContentId(diagramItem.id)
+      setContentId(new Date().getTime().toString())
     }
   }, [diagramItem])
 
