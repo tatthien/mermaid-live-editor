@@ -1,15 +1,16 @@
 import MonacoEditor from '@monaco-editor/react'
 import { IconLoader } from '@tabler/icons-react'
 import { debounce } from 'lodash'
+import { useEffect, useRef } from 'react'
 
 interface EditorProps {
   content: string
-  path: string
   onChange: (value: string | undefined) => void
   readOnly?: boolean
 }
 
-export default function Editor({ content, path, onChange, readOnly }: EditorProps) {
+export default function Editor({ content, onChange, readOnly }: EditorProps) {
+  const editorRef = useRef<any>(null)
   const editorOptions = {
     automaticLayout: true,
     minimap: { enabled: false },
@@ -18,9 +19,19 @@ export default function Editor({ content, path, onChange, readOnly }: EditorProp
     readOnly,
   }
 
+  useEffect(() => {
+    if (editorRef.current && content !== editorRef.current.getValue()) {
+      editorRef.current.setValue(content)
+    }
+  }, [content])
+
   const onEditorChange = debounce((value) => {
     onChange(value)
   }, 400)
+
+  const onEditorMounted = (editor: any) => {
+    editorRef.current = editor
+  }
 
   return (
     <MonacoEditor
@@ -31,9 +42,9 @@ export default function Editor({ content, path, onChange, readOnly }: EditorProp
           <IconLoader size={20} />
         </span>
       }
-      path={path}
       options={editorOptions}
       onChange={onEditorChange}
+      onMount={onEditorMounted}
       defaultLanguage='apex'
     />
   )

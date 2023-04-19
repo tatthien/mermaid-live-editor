@@ -1,19 +1,29 @@
 import { Message, MessageRole } from '@/types'
-import { IconSparkles, IconChevronDown, IconChevronUp, IconLoader } from '@tabler/icons-react'
+import {
+  IconSparkles,
+  IconChevronDown,
+  IconChevronUp,
+  IconLoader,
+  IconCircleKeyFilled,
+  IconCircleX,
+} from '@tabler/icons-react'
 import axios from 'axios'
-import { useState, KeyboardEvent, useRef, useEffect } from 'react'
+import { useState, KeyboardEvent, useRef, useEffect, ChangeEvent } from 'react'
 
 import MessageItem from './MessageItem'
 
 interface ChatGPTProps {
   onMessage: (value: string | undefined) => void
+  content: string
 }
 
-export default function ChatGPT({ onMessage }: ChatGPTProps) {
+export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const messageRef = useRef<HTMLDivElement>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [showMessages, setShowMessages] = useState<boolean>()
   const [isLoading, setIsLoading] = useState(false)
+  const [showKey, setShowKey] = useState(true)
+  const [apiKey, setApiKey] = useState('')
 
   useEffect(() => {
     const value = window.localStorage.getItem('ud_show_chatgpt_messages')
@@ -37,21 +47,48 @@ export default function ChatGPT({ onMessage }: ChatGPTProps) {
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (isLoading) return
-      const value = event.currentTarget.value
+      const value = event.currentTarget.value.trim()
+      if (value === '') return
       const newMessages = [...messages, { role: 'user', content: String(value) }]
       setMessages(newMessages)
       event.currentTarget.value = ''
       setIsLoading(true)
       try {
-        const { data } = await axios.post('/api/magic', {
-          messages: newMessages,
-        })
+        const { data } = await axios.post(
+          'https://api.openai.com/v1/chat/completions',
+          {
+            model: 'gpt-3.5-turbo-0301',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a system that parses natural languages to diagrams in PlantUML format. Only respond the valid PlantUML code that can be rendered without any syntax errors and short explanation. Response in the format: code:<code>explanation:<explanation>. The <code> should be a markdown code block.`,
+              },
+              {
+                role: 'assistant',
+                content: content ? `Current diagram: ${content}` : '',
+              },
+              ...newMessages,
+            ],
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            max_tokens: 300,
+            stream: false,
+            temperature: 0.7,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+            },
+          }
+        )
 
-        setMessages([...newMessages, { role: 'assistant', content: data.result }])
+        const result = data?.choices?.[0]?.message?.content ?? '```ERROR```'
+
+        setMessages([...newMessages, { role: 'assistant', content: result }])
 
         // get plantuml code from the result
         const regex = /```(?:plantuml|)\n([\s\S]*?)```/
-        const matches = data.result.match(regex)
+        const matches = result.match(regex)
         if (matches[1]) {
           onMessage(matches[1])
         }
@@ -64,6 +101,10 @@ export default function ChatGPT({ onMessage }: ChatGPTProps) {
 
   function onClickBtnShowMessages() {
     setShowMessages(!showMessages)
+  }
+
+  function onChangeApiKey(event: ChangeEvent<HTMLInputElement>) {
+    setApiKey(event.currentTarget.value)
   }
 
   return (
@@ -119,7 +160,37 @@ export default function ChatGPT({ onMessage }: ChatGPTProps) {
               <IconLoader size={20} />
             </span>
           )}
+          {!showKey && (
+            <button
+              onClick={() => {
+                setShowKey(true)
+              }}
+              className='inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border border-slate-200 bg-white px-1.5 py-1 text-sm font-medium text-slate-600 opacity-100 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300'>
+              Show key
+            </button>
+          )}
         </div>
+        {showKey && (
+          <div className='mt-4 flex items-center gap-2'>
+            <span className='text-stale-600'>
+              <IconCircleKeyFilled />
+            </span>
+            <input
+              type='password'
+              onChange={onChangeApiKey}
+              className='w-full outline-none'
+              placeholder='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+              value={apiKey}
+            />
+            <button
+              onClick={() => {
+                setShowKey(false)
+              }}
+              className='inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border border-slate-200 bg-white px-1.5 py-1 text-sm font-medium text-slate-600 opacity-100 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300'>
+              Hide key
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

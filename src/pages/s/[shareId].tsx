@@ -38,7 +38,6 @@ export default function Home({ shareId, diagram }: IHomeProps) {
               <Sidebar>
                 <Editor
                   content={content}
-                  path={shareId}
                   onChange={(value: string | undefined) => setContent(String(value))}
                   readOnly={true}
                 />

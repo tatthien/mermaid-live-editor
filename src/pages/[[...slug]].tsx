@@ -48,7 +48,6 @@ export default function Home() {
   useEffect(() => {
     if (diagramItem) {
       setContent(diagramItem.content)
-      setContentId(new Date().getTime().toString())
     }
   }, [diagramItem])
 
@@ -82,7 +81,6 @@ export default function Home() {
 
   async function onMessage(value: any) {
     setContent(value)
-    setContentId(new Date().getTime().toString())
 
     if (slug) {
       const data = await updateDiagramContent(String(value), slug[0])
@@ -107,17 +105,15 @@ export default function Home() {
             <Allotment.Pane visible={showSidebar} preferredSize={450}>
               <Sidebar>
                 <>
-                  <Editor path={contentId} content={content} onChange={onEditorChange} />
+                  <Editor content={content} onChange={onEditorChange} />
                 </>
               </Sidebar>
             </Allotment.Pane>
             <Allotment.Pane>
               <Preview content={content} />
-              {user.id && (
-                <div className='absolute bottom-0 left-0 right-0'>
-                  <ChatGPT onMessage={onMessage} />
-                </div>
-              )}
+              <div className='absolute bottom-0 left-0 right-0'>
+                <ChatGPT onMessage={onMessage} content={content} />
+              </div>
             </Allotment.Pane>
           </Allotment>
         </main>
