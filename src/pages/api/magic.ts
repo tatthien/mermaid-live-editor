@@ -33,7 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
     const result = data?.choices?.[0]?.message?.content ?? '```ERROR```'
     res.status(200).json({
-      id: data.id,
       result,
     })
   } catch (err: any) {
