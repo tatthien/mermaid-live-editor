@@ -14,9 +14,6 @@ export default function Login() {
     setIsLoading(true)
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
-      options: {
-        shouldCreateUser: false,
-      },
     })
     setIsLoading(false)
     if (error) {
@@ -74,13 +71,6 @@ export default function Login() {
             </button>
           </div>
         </form>
-      </div>
-      <div className='mt-6'>
-        <a
-          href='https://tally.so/r/nG6E5Z'
-          className='text-sm text-slate-600 hover:text-slate-900 hover:underline'>
-          🔐 Request access
-        </a>
       </div>
     </div>
   )
