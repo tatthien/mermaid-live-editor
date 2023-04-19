@@ -16,6 +16,7 @@ importers:
       '@types/dompurify': ^3.0.1
       '@types/js-cookie': ^3.0.3
       '@types/lodash': ^4.14.192
+      '@types/marked': ^4.0.8
       '@types/node': 18.15.11
       '@types/plantuml-encoder': ^1.4.0
       '@types/react': 18.0.32
@@ -31,6 +32,7 @@ importers:
       eslint-config-next: 13.2.4
       js-cookie: ^3.0.1
       lodash: ^4.17.21
+      marked: ^4.3.0
       mermaid: ^10.0.2
       next: 13.2.4
       normalizr: ^3.6.2
@@ -65,6 +67,7 @@ importers:
       eslint-config-next: 13.2.4_vwh6htx42aidho2qgfca5u5rwm
       js-cookie: 3.0.1
       lodash: 4.17.21
+      marked: 4.3.0
       mermaid: 10.0.2
       next: 13.2.4_biqbaboplfbrettd7655fr4n2y
       normalizr: 3.6.2
@@ -80,6 +83,7 @@ importers:
       '@types/dompurify': 3.0.1
       '@types/js-cookie': 3.0.3
       '@types/lodash': 4.14.192
+      '@types/marked': 4.0.8
       '@types/plantuml-encoder': 1.4.0
       autoprefixer: 10.4.14_postcss@8.4.21
       eslint: 8.37.0
@@ -835,6 +839,10 @@ packages:
 
   /@types/lodash/4.14.192:
     resolution: {integrity: sha512-km+Vyn3BYm5ytMO13k9KTp27O75rbQ0NFw+U//g+PX7VZyjCioXaRFisqSIJRECljcTv73G3i6BpglNGHgUQ5A==}
+    dev: true
+
+  /@types/marked/4.0.8:
+    resolution: {integrity: sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==}
     dev: true
 
   /@types/node/18.15.11:
@@ -2932,6 +2940,12 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: false
+
+  /marked/4.3.0:
+    resolution: {integrity: sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==}
+    engines: {node: '>= 12'}
+    hasBin: true
     dev: false
 
   /merge2/1.4.1:

@@ -1,8 +1,10 @@
+import ChatGPT from '@/components/ChatGPT'
 import DiagramList from '@/components/DiagramList'
 import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
+import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
 import { editDiagram, setSelectedDiagramId } from '@/stores/diagrams'
@@ -21,6 +23,7 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [contentId, setContentId] = useState('')
   const { showSidebar, showDiagramList } = useGlobalUI()
+  const { user } = useAuth()
   const router = useRouter()
   const { slug } = router.query
   const dispatch = useDispatch()
@@ -55,20 +58,37 @@ export default function Home() {
     }
   }, [slug])
 
+  async function updateDiagramContent(value: string, slug: string) {
+    const { data } = await supabase
+      .from('diagrams')
+      .update({ content: value })
+      .eq('id', slug)
+      .select('*,shares(*)')
+      .single()
+    await supabase.from('shares').update({ content: value }).eq('diagram_id', slug)
+    return data
+  }
+
   async function onEditorChange(value: any) {
     if (slug) {
-      const { data } = await supabase
-        .from('diagrams')
-        .update({ content: value })
-        .eq('id', slug[0])
-        .select('*,shares(*)')
-        .single()
-      await supabase.from('shares').update({ content: value }).eq('diagram_id', slug[0])
+      const data = await updateDiagramContent(String(value), slug[0])
       if (data) {
         dispatch(editDiagram(data))
       }
     } else {
       setContent(value)
+    }
+  }
+
+  async function onMessage(value: any) {
+    setContent(value)
+    setContentId(new Date().getTime().toString())
+
+    if (slug) {
+      const data = await updateDiagramContent(String(value), slug[0])
+      if (data) {
+        dispatch(editDiagram(data))
+      }
     }
   }
 
@@ -86,11 +106,18 @@ export default function Home() {
           <Allotment>
             <Allotment.Pane visible={showSidebar} preferredSize={450}>
               <Sidebar>
-                <Editor path={contentId} content={content} onChange={onEditorChange} />
+                <>
+                  <Editor path={contentId} content={content} onChange={onEditorChange} />
+                </>
               </Sidebar>
             </Allotment.Pane>
             <Allotment.Pane>
               <Preview content={content} />
+              {user.id && (
+                <div className='absolute bottom-0 left-0 right-0'>
+                  <ChatGPT onMessage={onMessage} />
+                </div>
+              )}
             </Allotment.Pane>
           </Allotment>
         </main>

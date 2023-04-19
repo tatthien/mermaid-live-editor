@@ -95,14 +95,15 @@ export default function Preview({ content }: IPreviewProps) {
                 />
               </div>
             </div>
-            <div className='absolute left-[1rem] top-[1rem]'>
-              {isGeneratingPreview && (
-                <span className='block animate-spin text-slate-500'>
+            {isGeneratingPreview && (
+              <div className='absolute left-[50%] top-[50%] flex -translate-x-[50%] -translate-y-[50%] items-center gap-2 rounded-md bg-white p-4'>
+                <span className='inline-flex animate-spin text-slate-500'>
                   <IconLoader size={20} />
                 </span>
-              )}
-            </div>
-            <div className='absolute bottom-[1rem] left-[1rem]'>
+                <span>Loading...</span>
+              </div>
+            )}
+            <div className='absolute left-[1rem] top-[1rem]'>
               <div className='flex flex-col gap-1'>
                 <ActionButton
                   onClick={() => zoomIn()}

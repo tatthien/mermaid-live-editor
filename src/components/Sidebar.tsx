@@ -4,7 +4,7 @@ interface ISidebarProps {
 
 export default function Sidebar({ children }: ISidebarProps) {
   return (
-    <div className='border-r'>
+    <div className='relative border-r'>
       <div>{children}</div>
     </div>
   )
