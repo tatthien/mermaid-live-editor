@@ -5,7 +5,6 @@ import {
   IconChevronUp,
   IconLoader,
   IconCircleKeyFilled,
-  IconCircleX,
 } from '@tabler/icons-react'
 import axios from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect, ChangeEvent } from 'react'
@@ -24,6 +23,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showKey, setShowKey] = useState(true)
   const [apiKey, setApiKey] = useState('')
+  const [code, setCode] = useState('')
 
   useEffect(() => {
     const value = window.localStorage.getItem('ud_show_chatgpt_messages')
@@ -44,6 +44,10 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     }
   }, [showMessages])
 
+  useEffect(() => {
+    setCode(content)
+  }, [content])
+
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (isLoading) return
@@ -57,17 +61,18 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
         const { data } = await axios.post(
           'https://api.openai.com/v1/chat/completions',
           {
-            model: 'gpt-3.5-turbo-0301',
+            model: 'gpt-3.5-turbo',
             messages: [
               {
                 role: 'system',
-                content: `You are a system that parses natural languages to diagrams in PlantUML format. Only respond the valid PlantUML code that can be rendered without any syntax errors and short explanation. Response in the format: code:<code>explanation:<explanation>. The <code> should be a markdown code block.`,
+                content: `Understand the PLANTUML code below. Then help users to modify the PLANTUML code. The response must be a valid PLANTUML code. ONLY respond the code in the markdown code block. DO NOT explain why. Here is the code:\n\n${
+                  '```\n' + code + '\n```'
+                }`,
               },
               {
-                role: 'assistant',
-                content: content ? `Current diagram: ${content}` : '',
+                role: 'user',
+                content: String(value),
               },
-              ...newMessages,
             ],
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -84,12 +89,11 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
 
         const result = data?.choices?.[0]?.message?.content ?? '```ERROR```'
 
-        setMessages([...newMessages, { role: 'assistant', content: result }])
-
         // get plantuml code from the result
         const regex = /```(?:plantuml|)\n([\s\S]*?)```/
         const matches = result.match(regex)
         if (matches[1]) {
+          setCode(matches[1])
           onMessage(matches[1])
         }
       } catch (err) {
