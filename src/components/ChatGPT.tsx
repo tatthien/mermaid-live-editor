@@ -5,11 +5,10 @@ import {
   IconChevronUp,
   IconLoader,
   IconCircleKeyFilled,
+  IconSettings,
 } from '@tabler/icons-react'
 import axios from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect, ChangeEvent } from 'react'
-
-import MessageItem from './MessageItem'
 
 interface ChatGPTProps {
   onMessage: (value: string | undefined) => void
@@ -17,30 +16,25 @@ interface ChatGPTProps {
 }
 
 export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
-  const messageRef = useRef<HTMLDivElement>(null)
-  const [messages, setMessages] = useState<Message[]>([])
   const [showMessages, setShowMessages] = useState<boolean>()
   const [isLoading, setIsLoading] = useState(false)
-  const [showKey, setShowKey] = useState(true)
   const [apiKey, setApiKey] = useState('')
   const [code, setCode] = useState('')
 
   useEffect(() => {
-    const value = window.localStorage.getItem('ud_show_chatgpt_messages')
+    const value = localStorage.getItem('UD_showSettings')
+    const key = localStorage.getItem('UD_apiKey')
     if (value) {
       setShowMessages(value === 'true')
+    }
+    if (key) {
+      setApiKey(key)
     }
   }, [])
 
   useEffect(() => {
-    if (messageRef.current) {
-      messageRef.current.scrollTop = messageRef.current.scrollHeight
-    }
-  }, [messages])
-
-  useEffect(() => {
     if (typeof showMessages !== 'undefined') {
-      window.localStorage.setItem('ud_show_chatgpt_messages', String(showMessages))
+      localStorage.setItem('UD_showSettings', String(showMessages))
     }
   }, [showMessages])
 
@@ -48,13 +42,15 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     setCode(content)
   }, [content])
 
+  useEffect(() => {
+    localStorage.setItem('UD_apiKey', String(apiKey))
+  }, [apiKey])
+
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (isLoading) return
       const value = event.currentTarget.value.trim()
       if (value === '') return
-      const newMessages = [...messages, { role: 'user', content: String(value) }]
-      setMessages(newMessages)
       event.currentTarget.value = ''
       setIsLoading(true)
       try {
@@ -115,39 +111,29 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     <div className='space-y-2 py-6 pl-4 pr-6'>
       <div className='flex justify-end'>
         <button
-          className='inline-flex items-center justify-center rounded-full border bg-white p-1 shadow'
+          className='inline-flex items-center justify-center rounded-full border bg-white p-1 text-slate-600 shadow transition hover:text-slate-900'
           onClick={onClickBtnShowMessages}>
-          {showMessages ? <IconChevronDown /> : <IconChevronUp />}
+          <IconSettings />
         </button>
       </div>
+
       {showMessages && (
-        <div
-          className='max-h-[400px] overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-md'
-          ref={messageRef}>
-          <div className='space-y-4'>
-            {messages.length > 0 ? (
-              messages.map((msg, index) => <MessageItem message={msg} key={index} />)
-            ) : (
-              <div className='flex gap-2'>
-                <span className='text-2xl'>🤖</span>
-                <div className='flex items-center gap-1 rounded-lg bg-orange-100 px-3 py-1 text-sm'>
-                  {`Let's ask me about diagrams`}
-                </div>
-              </div>
-            )}
-            {isLoading && (
-              <div className='flex gap-2'>
-                <span className='text-2xl'>🤖</span>
-                <div className='flex items-center gap-1 rounded-lg bg-orange-100 px-3 py-1 text-sm'>
-                  <span className='block h-2 w-2 animate-bounce rounded-full bg-orange-500'></span>
-                  <span className='block h-2 w-2 animate-bounce rounded-full bg-orange-600'></span>
-                  <span className='block h-2 w-2 animate-bounce rounded-full bg-orange-700'></span>
-                </div>
-              </div>
-            )}
+        <div className='max-h-[400px] overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-md'>
+          <div className='flex items-center gap-2'>
+            <span className='text-stale-600'>
+              <IconCircleKeyFilled />
+            </span>
+            <input
+              type='password'
+              onChange={onChangeApiKey}
+              className='w-full outline-none'
+              placeholder='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+              value={apiKey}
+            />
           </div>
         </div>
       )}
+
       <div className='rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-md'>
         <div className='flex items-center gap-2'>
           <span className='text-orange-600'>
@@ -164,37 +150,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
               <IconLoader size={20} />
             </span>
           )}
-          {!showKey && (
-            <button
-              onClick={() => {
-                setShowKey(true)
-              }}
-              className='inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border border-slate-200 bg-white px-1.5 py-1 text-sm font-medium text-slate-600 opacity-100 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300'>
-              Show key
-            </button>
-          )}
         </div>
-        {showKey && (
-          <div className='mt-4 flex items-center gap-2'>
-            <span className='text-stale-600'>
-              <IconCircleKeyFilled />
-            </span>
-            <input
-              type='password'
-              onChange={onChangeApiKey}
-              className='w-full outline-none'
-              placeholder='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-              value={apiKey}
-            />
-            <button
-              onClick={() => {
-                setShowKey(false)
-              }}
-              className='inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded border border-slate-200 bg-white px-1.5 py-1 text-sm font-medium text-slate-600 opacity-100 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring focus:ring-slate-300'>
-              Hide key
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )
