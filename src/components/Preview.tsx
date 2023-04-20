@@ -1,5 +1,14 @@
 import ActionButton from '@/components/ActionButton'
-import { IconDownload, IconMinus, IconPlus, IconRefresh, IconLoader } from '@tabler/icons-react'
+import { useGlobalUI } from '@/hooks/useGlobalUI'
+import {
+  IconDownload,
+  IconMinus,
+  IconPlus,
+  IconRefresh,
+  IconLoader,
+  IconMaximize,
+  IconMaximizeOff,
+} from '@tabler/icons-react'
 import axios from 'axios'
 import DOMPurify from 'dompurify'
 import plantumlEncoder from 'plantuml-encoder'
@@ -14,6 +23,7 @@ export default function Preview({ content }: IPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
   const [isDownloadingPng, setIsDownloadingPng] = useState(false)
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
+  const { showSidebar, setShowSidebar } = useGlobalUI()
 
   useEffect(() => {
     if (!previewRef.current) return
@@ -78,6 +88,13 @@ export default function Preview({ content }: IPreviewProps) {
             </TransformComponent>
             <div className='absolute right-[1rem] top-[1rem]'>
               <div className='flex gap-2'>
+                <ActionButton
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  icon={showSidebar ? <IconMaximize size={20} /> : <IconMaximizeOff size={20} />}
+                  text={showSidebar ? 'Full Preview' : 'Code + Preview'}
+                  variant='secondary'
+                  displayText
+                />
                 <ActionButton
                   onClick={btnDownloadSVGHandler}
                   variant='secondary'

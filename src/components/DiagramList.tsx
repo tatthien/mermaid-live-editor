@@ -46,7 +46,11 @@ export default function DiagramList() {
       .single()
 
     if (error) {
-      alert(error)
+      let message = error.message
+      if (!user.id) {
+        message = 'Login to fully manage your diagrams'
+      }
+      alert(message)
     } else {
       dispatch(addDiagram(data))
       router.push(`/${data.id}`)

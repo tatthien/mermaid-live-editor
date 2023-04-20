@@ -4,7 +4,6 @@ import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
-import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
 import { editDiagram, setSelectedDiagramId } from '@/stores/diagrams'
@@ -12,7 +11,6 @@ import { Allotment } from 'allotment'
 import cx from 'clsx'
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
-import { redirect } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,9 +19,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [content, setContent] = useState('')
-  const [contentId, setContentId] = useState('')
   const { showSidebar, showDiagramList } = useGlobalUI()
-  const { user } = useAuth()
   const router = useRouter()
   const { slug } = router.query
   const dispatch = useDispatch()

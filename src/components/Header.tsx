@@ -4,14 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
 import { supabase } from '@/lib/supabase'
 import { editDiagram } from '@/stores/diagrams'
-import {
-  IconShare,
-  IconLink,
-  IconCheck,
-  IconLayoutSidebar,
-  IconMaximize,
-  IconMaximizeOff,
-} from '@tabler/icons-react'
+import { IconShare, IconLink, IconCheck, IconLayoutSidebar } from '@tabler/icons-react'
 import cx from 'clsx'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -30,7 +23,7 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
   const [showShareBtn, setShowShareBtn] = useState(false)
   const [copied, setCopied] = useState(false)
   const [diagramTitle, setDiagramTitle] = useState('')
-  const { showSidebar, setShowSidebar, toggleDiagramList } = useGlobalUI()
+  const { toggleDiagramList } = useGlobalUI()
   const { user } = useAuth()
   const diagramItem = useSelector((state: any) => state.diagrams.byId[state.diagrams.selectedId])
   const dispatch = useDispatch()
@@ -126,7 +119,6 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
               text='Show diagram list'
               variant='secondary'
               onClick={toggleDiagramList}
-              disabled={!user.id}
             />
           )}
           <div className='flex items-center'>
@@ -171,12 +163,6 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
               </div>
             )}
           </div>
-          <ActionButton
-            onClick={() => setShowSidebar(!showSidebar)}
-            icon={showSidebar ? <IconMaximize size={20} /> : <IconMaximizeOff size={20} />}
-            text='Toggle editor'
-            variant='secondary'
-          />
           {user.id ? (
             <>
               <span className='text-sm'>{user.email}</span>
