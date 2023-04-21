@@ -3,7 +3,7 @@ import cx from 'clsx'
 import type { ReactNode, MouseEventHandler } from 'react'
 
 export const ActionButton = (props: {
-  icon: ReactNode
+  icon?: ReactNode
   text: string
   displayText?: boolean
   variant?: string

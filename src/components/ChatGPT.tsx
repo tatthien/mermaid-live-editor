@@ -1,4 +1,5 @@
 import { Message, MessageRole } from '@/types'
+import { Action } from '@radix-ui/react-toast'
 import {
   IconSparkles,
   IconChevronDown,
@@ -6,9 +7,12 @@ import {
   IconLoader,
   IconCircleKeyFilled,
   IconSettings,
+  IconEdit,
 } from '@tabler/icons-react'
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect, ChangeEvent } from 'react'
+
+import ActionButton from './ActionButton'
 
 interface ChatGPTProps {
   onMessage: (value: string | undefined) => void
@@ -16,8 +20,11 @@ interface ChatGPTProps {
 }
 
 export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
+  const apiKeyInputRef = useRef<HTMLInputElement>(null)
   const [showMessages, setShowMessages] = useState<boolean>()
   const [isLoading, setIsLoading] = useState(false)
+  const [isEditingKey, setIsEditingKey] = useState(false)
+  const [isSavingApiKey, setIsSavingApiKey] = useState(false)
   const [apiKey, setApiKey] = useState('')
   const [code, setCode] = useState('')
 
@@ -41,10 +48,6 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   useEffect(() => {
     setCode(content)
   }, [content])
-
-  useEffect(() => {
-    localStorage.setItem('UD_apiKey', String(apiKey))
-  }, [apiKey])
 
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
@@ -103,8 +106,41 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     setShowMessages(!showMessages)
   }
 
-  function onChangeApiKey(event: ChangeEvent<HTMLInputElement>) {
-    setApiKey(event.currentTarget.value)
+  async function onSaveApiKey() {
+    const key = apiKeyInputRef.current?.value.trim()
+    if (!key) return
+    setIsSavingApiKey(true)
+    try {
+      await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'user',
+              content: 'Hi',
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${key}`,
+          },
+        }
+      )
+      localStorage.setItem('UD_apiKey', key)
+      setApiKey(key)
+      setIsEditingKey(false)
+    } catch (err) {
+      if (isAxiosError(err) && err.response) {
+        if (err.response.status === 401) {
+          alert('Wrong API key!')
+        } else {
+          alert('Opps! Something went wrong')
+        }
+      }
+    }
+    setIsSavingApiKey(false)
   }
 
   return (
@@ -123,13 +159,49 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
             <span className='text-stale-600'>
               <IconCircleKeyFilled />
             </span>
-            <input
-              type='password'
-              onChange={onChangeApiKey}
-              className='w-full outline-none'
-              placeholder='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-              value={apiKey}
-            />
+            {isEditingKey ? (
+              <div className='flex flex-1 items-center gap-4'>
+                <input
+                  type='text'
+                  className='w-full flex-auto outline-none'
+                  placeholder='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                  defaultValue={apiKey}
+                  autoFocus
+                  ref={apiKeyInputRef}
+                />
+                <div className='flex items-center gap-2'>
+                  <ActionButton text='Save' displayText onClick={onSaveApiKey} loading={isSavingApiKey} />
+                  <ActionButton
+                    variant='secondary'
+                    text='Cancel'
+                    displayText
+                    onClick={() => setIsEditingKey(false)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className='flex flex-1 items-center justify-between'>
+                <div>
+                  {apiKey === '' ? (
+                    <span className='font-mono text-sm'>API key is missing</span>
+                  ) : (
+                    <>
+                      <span>&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;</span>
+                      <span className='font-mono'>{apiKey.substring(apiKey.length - 5, apiKey.length)}</span>
+                    </>
+                  )}
+                </div>
+                <ActionButton
+                  className='ml-4'
+                  variant='secondary'
+                  text={apiKey ? 'Edit' : 'Add new'}
+                  displayText
+                  onClick={() => {
+                    setIsEditingKey(true)
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
