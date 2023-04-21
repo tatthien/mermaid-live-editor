@@ -10,6 +10,11 @@ interface ChatGPTProps {
   content: string
 }
 
+const initialSettings = {
+  model: 'gpt-3.5-turbo',
+  temperature: 0.5,
+}
+
 export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const apiKeyInputRef = useRef<HTMLInputElement>(null)
   const [showMessages, setShowMessages] = useState<boolean>()
@@ -18,10 +23,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const [isSavingApiKey, setIsSavingApiKey] = useState(false)
   const [apiKey, setApiKey] = useState('')
   const [code, setCode] = useState('')
-  const [settingsForm, setSettingsForm] = useState({
-    model: 'gpt-3.5-turbo',
-    temperature: 0.5,
-  })
+  const [settingsForm, setSettingsForm] = useState(initialSettings)
 
   useEffect(() => {
     const value = localStorage.getItem('UD_showSettings')
@@ -49,7 +51,9 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   }, [content])
 
   useEffect(() => {
-    localStorage.setItem('UD_settings', JSON.stringify(settingsForm))
+    if (settingsForm !== initialSettings) {
+      localStorage.setItem('UD_settings', JSON.stringify(settingsForm))
+    }
   }, [settingsForm])
 
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
@@ -80,7 +84,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
             presence_penalty: 0,
             max_tokens: 300,
             stream: false,
-            temperature: settingsForm.temperature,
+            temperature: Number(settingsForm.temperature),
           },
           {
             headers: {
