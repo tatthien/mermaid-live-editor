@@ -1,16 +1,7 @@
 import { Message, MessageRole } from '@/types'
-import { Action } from '@radix-ui/react-toast'
-import {
-  IconSparkles,
-  IconChevronDown,
-  IconChevronUp,
-  IconLoader,
-  IconCircleKeyFilled,
-  IconSettings,
-  IconEdit,
-} from '@tabler/icons-react'
+import { IconSparkles, IconLoader, IconCircleKeyFilled, IconSettings } from '@tabler/icons-react'
 import axios, { isAxiosError } from 'axios'
-import { useState, KeyboardEvent, useRef, useEffect, ChangeEvent } from 'react'
+import { useState, KeyboardEvent, useRef, useEffect } from 'react'
 
 import ActionButton from './ActionButton'
 
@@ -27,15 +18,23 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const [isSavingApiKey, setIsSavingApiKey] = useState(false)
   const [apiKey, setApiKey] = useState('')
   const [code, setCode] = useState('')
+  const [settingsForm, setSettingsForm] = useState({
+    model: 'gpt-3.5-turbo',
+    temperature: 0.5,
+  })
 
   useEffect(() => {
     const value = localStorage.getItem('UD_showSettings')
     const key = localStorage.getItem('UD_apiKey')
+    const settings = localStorage.getItem('UD_settings')
     if (value) {
       setShowMessages(value === 'true')
     }
     if (key) {
       setApiKey(key)
+    }
+    if (settings) {
+      setSettingsForm(JSON.parse(settings))
     }
   }, [])
 
@@ -49,6 +48,10 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     setCode(content)
   }, [content])
 
+  useEffect(() => {
+    localStorage.setItem('UD_settings', JSON.stringify(settingsForm))
+  }, [settingsForm])
+
   async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (isLoading) return
@@ -60,7 +63,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
         const { data } = await axios.post(
           'https://api.openai.com/v1/chat/completions',
           {
-            model: 'gpt-3.5-turbo',
+            model: settingsForm.model,
             messages: [
               {
                 role: 'system',
@@ -77,7 +80,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
             presence_penalty: 0,
             max_tokens: 300,
             stream: false,
-            temperature: 0.7,
+            temperature: settingsForm.temperature,
           },
           {
             headers: {
@@ -96,7 +99,13 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
           onMessage(matches[1])
         }
       } catch (err) {
-        console.log(err)
+        if (isAxiosError(err) && err.response) {
+          if (err.status) {
+            alert('Wrong API key!')
+          } else {
+            alert(err.response.data.error.message)
+          }
+        }
       }
       setIsLoading(false)
     }
@@ -143,6 +152,13 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     setIsSavingApiKey(false)
   }
 
+  function handleSettingsInputChange(event: any) {
+    const target = event.target
+    const value = target.type === 'checkbox' ? target.checked : target.value
+    const name = target.name
+    setSettingsForm({ ...settingsForm, ...{ [name]: value } })
+  }
+
   return (
     <div className='space-y-2 py-6 pl-4 pr-6'>
       <div className='flex justify-end'>
@@ -182,7 +198,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
             ) : (
               <div className='flex flex-1 items-center justify-between'>
                 <div>
-                  {apiKey === '' ? (
+                  {!apiKey ? (
                     <span className='font-mono text-sm'>API key is missing</span>
                   ) : (
                     <>
@@ -202,6 +218,33 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
                 />
               </div>
             )}
+          </div>
+          <div className='mt-3 border-t pt-3'>
+            <div className='mb-4 text-sm font-medium text-slate-600'>Other settings</div>
+            <div className='mb-2 flex items-center'>
+              <label className='block min-w-[100px] text-sm text-slate-600'>Model</label>
+              <select
+                name='model'
+                value={settingsForm.model}
+                onChange={handleSettingsInputChange}
+                className='rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'>
+                <option value='gpt-3.5-turbo'>gpt-3.5-turbo</option>
+                <option value='gpt-4'>gpt-4</option>
+              </select>
+            </div>
+            <div className='flex items-center'>
+              <label className='block min-w-[100px] text-sm text-slate-600'>Temperature</label>
+              <input
+                name='temperature'
+                type='number'
+                min='0'
+                max='1'
+                step='0.1'
+                className='rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'
+                value={settingsForm.temperature}
+                onChange={handleSettingsInputChange}
+              />
+            </div>
           </div>
         </div>
       )}
