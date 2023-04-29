@@ -49,7 +49,7 @@ export default function DiagramItem({ id }: DiagramItemProps) {
         'block cursor-pointer rounded border p-1 hover:bg-slate-100'
       )}>
       <div className='flex items-center justify-between gap-2'>
-        <div className='flex gap-2'>
+        <div className='flex w-[calc(100%-24px)] gap-2'>
           <div className='aspect-square shrink-0 rounded border bg-white '>
             <img
               src={`https://usediagram.com/api/png/${encodedUrl}`}
