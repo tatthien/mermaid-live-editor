@@ -1,5 +1,12 @@
 import { Message, MessageRole } from '@/types'
-import { IconSparkles, IconLoader, IconCircleKeyFilled, IconSettings } from '@tabler/icons-react'
+import {
+  IconSparkles,
+  IconLoader,
+  IconCircleKeyFilled,
+  IconSettings,
+  IconCircleX,
+  IconCircleLetterX,
+} from '@tabler/icons-react'
 import axios, { isAxiosError } from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect } from 'react'
 
@@ -17,7 +24,7 @@ const initialSettings = {
 
 export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
   const apiKeyInputRef = useRef<HTMLInputElement>(null)
-  const [showMessages, setShowMessages] = useState<boolean>()
+  const [showSettings, setShowSettings] = useState<boolean>()
   const [isLoading, setIsLoading] = useState(false)
   const [isEditingKey, setIsEditingKey] = useState(false)
   const [isSavingApiKey, setIsSavingApiKey] = useState(false)
@@ -29,22 +36,25 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     const value = localStorage.getItem('UD_showSettings')
     const key = localStorage.getItem('UD_apiKey')
     const settings = localStorage.getItem('UD_settings')
+
     if (value) {
-      setShowMessages(value === 'true')
+      setShowSettings(value === 'true')
     }
+
     if (key) {
       setApiKey(key)
     }
+
     if (settings) {
       setSettingsForm(JSON.parse(settings))
     }
   }, [])
 
   useEffect(() => {
-    if (typeof showMessages !== 'undefined') {
-      localStorage.setItem('UD_showSettings', String(showMessages))
+    if (typeof showSettings !== 'undefined') {
+      localStorage.setItem('UD_showSettings', String(showSettings))
     }
-  }, [showMessages])
+  }, [showSettings])
 
   useEffect(() => {
     setCode(content)
@@ -56,7 +66,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     }
   }, [settingsForm])
 
-  async function onSendMessage(event: KeyboardEvent<HTMLInputElement>) {
+  async function handleMsgInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (isLoading) return
       const value = event.currentTarget.value.trim()
@@ -115,11 +125,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
     }
   }
 
-  function onClickBtnShowMessages() {
-    setShowMessages(!showMessages)
-  }
-
-  async function onSaveApiKey() {
+  async function handleBtnSaveApiKey() {
     const key = apiKeyInputRef.current?.value.trim()
     if (!key) return
     setIsSavingApiKey(true)
@@ -168,12 +174,14 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
       <div className='flex justify-end'>
         <button
           className='inline-flex items-center justify-center rounded-full border bg-white p-1 text-slate-600 shadow transition hover:text-slate-900'
-          onClick={onClickBtnShowMessages}>
-          <IconSettings />
+          onClick={() => {
+            setShowSettings(!showSettings)
+          }}>
+          {showSettings ? <IconCircleX /> : <IconSettings />}
         </button>
       </div>
 
-      {showMessages && (
+      {showSettings && (
         <div className='max-h-[400px] overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-md'>
           <div className='flex items-center gap-2'>
             <span className='text-stale-600'>
@@ -190,7 +198,12 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
                   ref={apiKeyInputRef}
                 />
                 <div className='flex items-center gap-2'>
-                  <ActionButton text='Save' displayText onClick={onSaveApiKey} loading={isSavingApiKey} />
+                  <ActionButton
+                    text='Save'
+                    displayText
+                    onClick={handleBtnSaveApiKey}
+                    loading={isSavingApiKey}
+                  />
                   <ActionButton
                     variant='secondary'
                     text='Cancel'
@@ -211,15 +224,27 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
                     </>
                   )}
                 </div>
-                <ActionButton
-                  className='ml-4'
-                  variant='secondary'
-                  text={apiKey ? 'Edit' : 'Add new'}
-                  displayText
-                  onClick={() => {
-                    setIsEditingKey(true)
-                  }}
-                />
+                <div className='flex items-center gap-2'>
+                  <ActionButton
+                    variant='secondary'
+                    text={apiKey ? 'Edit' : 'Add new'}
+                    displayText
+                    onClick={() => {
+                      setIsEditingKey(true)
+                    }}
+                  />
+                  {apiKey && (
+                    <ActionButton
+                      variant='danger'
+                      text='Remove'
+                      displayText
+                      onClick={() => {
+                        setApiKey('')
+                        localStorage.setItem('UD_apiKey', '')
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -231,7 +256,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
                 name='model'
                 value={settingsForm.model}
                 onChange={handleSettingsInputChange}
-                className='rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'>
+                className='min-w-[150px] rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'>
                 <option value='gpt-3.5-turbo'>gpt-3.5-turbo</option>
                 <option value='gpt-4'>gpt-4</option>
               </select>
@@ -244,7 +269,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
                 min='0'
                 max='1'
                 step='0.1'
-                className='rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'
+                className='min-w-[150px] rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400'
                 value={settingsForm.temperature}
                 onChange={handleSettingsInputChange}
               />
@@ -255,20 +280,21 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
 
       <div className='rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-md'>
         <div className='flex items-center gap-2'>
-          <span className='text-orange-600'>
-            <IconSparkles />
-          </span>
-          <input
-            type='text'
-            onKeyDown={onSendMessage}
-            className='w-full outline-none'
-            placeholder={`What's in your mind?`}
-          />
-          {isLoading && (
+          {isLoading ? (
             <span className='inline-flex animate-spin text-slate-500'>
               <IconLoader size={20} />
             </span>
+          ) : (
+            <span className='text-orange-600'>
+              <IconSparkles />
+            </span>
           )}
+          <input
+            type='text'
+            onKeyDown={handleMsgInputKeyDown}
+            className='w-full outline-none'
+            placeholder={`E.g: generate OAuth flow`}
+          />
         </div>
       </div>
     </div>

@@ -18,10 +18,17 @@ export const ActionButton = (props: {
 
   const commonClasses =
     'inline-flex items-center justify-center gap-1.5 rounded border text-sm font-medium shadow-sm transition focus:outline-none focus:ring'
-  const variantClasses =
-    variant === 'primary'
-      ? 'bg-slate-900 text-white hover:bg-slate-700 focus:ring-slate-400'
-      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 focus:ring-slate-300'
+  let variantClasses = ''
+  switch (variant) {
+    case 'secondary':
+      variantClasses = 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 focus:ring-slate-300'
+      break
+    case 'danger':
+      variantClasses = 'bg-red-100 text-red-700 border-red-300 hover:bg-red-100 focus:ring-red-300'
+      break
+    default:
+      variantClasses = 'bg-slate-900 text-white hover:bg-slate-700 focus:ring-slate-400'
+  }
   const disabledClasses = disabled ? 'opacity-40 cursor-not-allowed' : 'opacity-100 cursor-pointer'
   const spacingClasses = displayText ? 'px-1.5 py-1' : 'p-0.5'
 
