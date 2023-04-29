@@ -174,8 +174,8 @@ export default function Header({ shareId: shareIdProp, content, showBtnDiagramLi
               </Link>
             </>
           ) : (
-            <Link href='/login' className='text-sm text-slate-500 hover:text-slate-900 hover:underline'>
-              Login
+            <Link href='/auth' className='text-sm text-slate-500 hover:text-slate-900 hover:underline'>
+              Login / Signup
             </Link>
           )}
         </div>

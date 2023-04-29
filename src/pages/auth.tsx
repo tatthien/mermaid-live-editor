@@ -4,7 +4,7 @@ import cx from 'clsx'
 import Link from 'next/link'
 import { ChangeEvent, useState } from 'react'
 
-export default function Login() {
+export default function Auth() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
@@ -52,7 +52,7 @@ export default function Login() {
             />
           </div>
           <div className='mb-4 text-sm text-slate-500'>
-            {`Simply enter your email address and we'll send you a magic link that you can use to access your account.`}
+            {`No password needed. Simply enter your email address and we'll send you a magic link that you can use to access your account.`}
           </div>
           <div>
             <button
