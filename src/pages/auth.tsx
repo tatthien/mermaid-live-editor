@@ -31,7 +31,7 @@ export default function Auth() {
         <img src='/logo.svg' alt='Logo' className='mx-auto mb-2 w-10' />
         <Link href='/'>usediagram.com</Link>
       </div>
-      <div className='w-[350px] max-w-[350px] rounded-md border bg-white p-4 shadow-md'>
+      <div className='w-[400px] max-w-[400px] rounded-md border bg-white p-4 shadow-md'>
         {error && (
           <div className='mb-4 rounded-md border border-red-300 bg-red-100 p-2 text-red-600'>{error}</div>
         )}
@@ -46,7 +46,7 @@ export default function Auth() {
             <input
               type='email'
               required
-              className='w-full rounded border border-slate-300 px-2 py-1 outline-none focus:border-slate-400 focus:ring focus:ring-slate-300'
+              className='w-full rounded border border-slate-300 px-2 py-1.5 outline-none focus:border-slate-400 focus:ring focus:ring-slate-300'
               placeholder='you@example.com'
               value={email}
               onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
@@ -61,7 +61,7 @@ export default function Auth() {
                 isLoading
                   ? 'cursor-not-allowed bg-slate-200 text-slate-900 hover:bg-slate-200'
                   : 'cursor-pointer bg-slate-900 text-white hover:bg-slate-700',
-                'inline-flex w-full items-center justify-center gap-1.5 rounded border px-2 py-1 font-medium shadow-sm transition focus:outline-none focus:ring focus:ring-slate-300'
+                'inline-flex w-full items-center justify-center gap-1.5 rounded border px-2 py-1.5 font-medium shadow-sm transition focus:outline-none focus:ring focus:ring-slate-300'
               )}
               disabled={isLoading}>
               <>
