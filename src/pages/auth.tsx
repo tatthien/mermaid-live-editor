@@ -27,7 +27,8 @@ export default function Auth() {
   }
   return (
     <div className='flex h-screen flex-col items-center justify-center bg-slate-50'>
-      <div className='mb-4 text-xl font-medium'>
+      <div className='mb-4 text-center text-xl font-medium'>
+        <img src='/logo.svg' alt='Logo' className='mx-auto mb-2 w-10' />
         <Link href='/'>usediagram.com</Link>
       </div>
       <div className='w-[350px] max-w-[350px] rounded-md border bg-white p-4 shadow-md'>
