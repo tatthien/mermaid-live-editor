@@ -1,12 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { Diagram } from 'mermaid/dist/Diagram'
+
+interface DiagramState {
+  byId: { [id: string]: Diagram }
+  allIds: string[]
+  selectedId: string
+}
+
+const initialState: DiagramState = {
+  byId: {},
+  allIds: [],
+  selectedId: '',
+}
 
 const diagramSlice = createSlice({
   name: 'diagrams',
-  initialState: {
-    byId: {},
-    allIds: [],
-    selectedId: '',
-  },
+  initialState,
   reducers: {
     setDiagramById: (state: any, action) => {
       state.byId = { ...action.payload }

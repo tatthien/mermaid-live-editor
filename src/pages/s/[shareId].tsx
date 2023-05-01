@@ -3,6 +3,7 @@ import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
+import { Diagram } from '@/types'
 import { createClient } from '@supabase/supabase-js'
 import { Allotment } from 'allotment'
 import { GetServerSidePropsContext } from 'next'
@@ -13,16 +14,15 @@ import { useEffect, useState } from 'react'
 const inter = Inter({ subsets: ['latin'] })
 
 interface IHomeProps {
-  diagram: string
-  shareId: string
+  diagram: Diagram
 }
 
-export default function Home({ shareId, diagram }: IHomeProps) {
+export default function Home({ diagram }: IHomeProps) {
   const [content, setContent] = useState('')
   const { showSidebar } = useGlobalUI()
 
   useEffect(() => {
-    setContent(diagram)
+    setContent(diagram.content)
   }, [diagram])
 
   return (
@@ -31,7 +31,7 @@ export default function Home({ shareId, diagram }: IHomeProps) {
         <title>Use Diagram | Visualize your ideas using Mermaid</title>
       </Head>
       <div className={`${inter.className} flex h-screen flex-col`}>
-        <Header showBtnDiagramList={false} shareId={shareId} content={content} />
+        <Header />
         <main className='relative flex flex-1'>
           <Allotment>
             <Allotment.Pane visible={showSidebar} preferredSize={450}>
@@ -60,7 +60,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     String(process.env.NEXT_PUBLIC_SP_PROJECT_URL),
     String(process.env.NEXT_PUBLIC_SP_ANON_KEY)
   )
-  const { data, error } = await client.from('shares').select('*').eq('share_id', shareId).limit(1)
+  const { data, error } = await client.from('shares').select('*').eq('share_id', shareId).single()
   if (error || !data.length) {
     return {
       notFound: true,
@@ -68,7 +68,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   return {
     props: {
-      diagram: data[0].content,
+      diagram: data,
       shareId: shareId,
     },
   }

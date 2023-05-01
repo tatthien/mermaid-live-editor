@@ -17,7 +17,7 @@ export const ActionButton = (props: {
   const variant = props.variant ?? 'primary'
 
   const commonClasses =
-    'inline-flex items-center justify-center gap-1.5 rounded border text-sm font-medium shadow-sm transition focus:outline-none focus:ring'
+    'inline-flex items-center justify-center gap-1.5 rounded border text-sm font-medium shadow-sm transition'
   let variantClasses = ''
   switch (variant) {
     case 'secondary':

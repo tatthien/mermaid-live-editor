@@ -1,19 +1,11 @@
-import { Message, MessageRole } from '@/types'
-import {
-  IconSparkles,
-  IconLoader,
-  IconCircleKeyFilled,
-  IconSettings,
-  IconCircleX,
-  IconCircleLetterX,
-} from '@tabler/icons-react'
+import { IconSparkles, IconLoader, IconCircleKeyFilled, IconSettings, IconCircleX } from '@tabler/icons-react'
 import axios, { isAxiosError } from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect } from 'react'
 
 import ActionButton from './ActionButton'
 
 interface ChatGPTProps {
-  onMessage: (value: string | undefined) => void
+  onMessage: (value: string) => void
   content: string
 }
 
@@ -183,6 +175,7 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
 
       {showSettings && (
         <div className='max-h-[400px] overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-md'>
+          <div className='mb-2 text-sm text-slate-600'>{`Your API key is stored locally on your browser.`}</div>
           <div className='flex items-center gap-2'>
             <span className='text-stale-600'>
               <IconCircleKeyFilled />

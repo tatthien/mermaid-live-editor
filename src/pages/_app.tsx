@@ -1,10 +1,12 @@
-import AuthProvider from '@/components/AuthProvider'
 import GlobalUIProvider from '@/components/GlobalUIProvider'
-import store from '@/stores/store'
+import { store } from '@/stores'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { Analytics } from '@vercel/analytics/react'
 import 'allotment/dist/style.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+import { useState } from 'react'
 import { Provider } from 'react-redux'
 
 import '../styles/globals.css'
@@ -13,6 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const title = 'Use Diagram | Visualize your ideas with PlantUML'
   const description =
     'UseDiagram.com turns your ideas into diagrams with a beautiful UI. Try usediagram.com today!'
+  const [supabase] = useState(() => createBrowserSupabaseClient())
   return (
     <>
       <Head>
@@ -36,13 +39,13 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name='twitter:title' content={title} />
         <meta name='twitter:description' content={description} />
       </Head>
-      <Provider store={store}>
-        <GlobalUIProvider>
-          <AuthProvider>
+      <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
+        <Provider store={store}>
+          <GlobalUIProvider>
             <Component {...pageProps} />
-          </AuthProvider>
-        </GlobalUIProvider>
-      </Provider>
+          </GlobalUIProvider>
+        </Provider>
+      </SessionContextProvider>
       <Analytics />
     </>
   )

@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase'
 import cx from 'clsx'
 import Link from 'next/link'
 

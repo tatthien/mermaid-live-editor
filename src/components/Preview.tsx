@@ -58,7 +58,7 @@ export default function Preview({ content }: IPreviewProps) {
     URL.revokeObjectURL(url)
   }
 
-  function btnDownloadSVGHandler() {
+  function handleDownloadSVG() {
     if (previewRef.current) {
       const svg = previewRef.current.querySelector('svg')
       const blob = new Blob([String(svg?.outerHTML)], { type: 'image/svg+xml;charset=utf-8' })
@@ -66,7 +66,7 @@ export default function Preview({ content }: IPreviewProps) {
     }
   }
 
-  async function btnDownloadPNGHandler() {
+  async function handleDownloadPNG() {
     if (previewRef.current) {
       setIsDownloadingPng(true)
       const encodedUrl = plantumlEncoder.encode(content)
@@ -91,19 +91,19 @@ export default function Preview({ content }: IPreviewProps) {
                 <ActionButton
                   onClick={() => setShowSidebar(!showSidebar)}
                   icon={showSidebar ? <IconMaximize size={20} /> : <IconMaximizeOff size={20} />}
-                  text={showSidebar ? 'Full Preview' : 'Code + Preview'}
+                  text={showSidebar ? 'Hide code' : 'Show code'}
                   variant='secondary'
                   displayText
                 />
                 <ActionButton
-                  onClick={btnDownloadSVGHandler}
+                  onClick={handleDownloadSVG}
                   variant='secondary'
                   icon={<IconDownload size={20} />}
                   displayText={true}
                   text='SVG'
                 />
                 <ActionButton
-                  onClick={btnDownloadPNGHandler}
+                  onClick={handleDownloadPNG}
                   variant='secondary'
                   icon={<IconDownload size={20} />}
                   displayText={true}
@@ -113,11 +113,11 @@ export default function Preview({ content }: IPreviewProps) {
               </div>
             </div>
             {isGeneratingPreview && (
-              <div className='absolute left-[50%] top-[50%] flex -translate-x-[50%] -translate-y-[50%] items-center gap-2 rounded-md bg-white p-4'>
+              <div className='absolute left-[50%] top-[50%] flex -translate-x-[50%] -translate-y-[50%] items-center gap-2 rounded-md bg-white px-2'>
                 <span className='inline-flex animate-spin text-slate-500'>
                   <IconLoader size={20} />
                 </span>
-                <span>Loading...</span>
+                <span>Generating...</span>
               </div>
             )}
             <div className='absolute left-[1rem] top-[1rem]'>

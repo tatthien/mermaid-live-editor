@@ -1,61 +1,39 @@
-import { useAuth } from '@/hooks/useAuth'
-import { supabase } from '@/lib/supabase'
-import { addDiagram, setDiagramAllIds, setDiagramById } from '@/stores/diagrams'
-import { diagramArr } from '@/stores/schema'
+import { useCreateDiagramMutation, useGetDiagramsQuery } from '@/services/diagram'
+import { useSession } from '@supabase/auth-helpers-react'
 import { IconCategory, IconEdit } from '@tabler/icons-react'
+import { isAxiosError } from 'axios'
 import { useRouter } from 'next/router'
-import { normalize } from 'normalizr'
-import { useEffect, useState } from 'react'
-import { useSelector, useDispatch, shallowEqual } from 'react-redux'
 
 import ActionButton from './ActionButton'
 import DiagramItem from './DiagramItem'
 
 export default function DiagramList() {
-  const [isCreating, setIsCreating] = useState(false)
-  const { user } = useAuth()
-  const diagramIds = useSelector((state: any) => state.diagrams.allIds, shallowEqual)
-  const dispatch = useDispatch()
   const router = useRouter()
+  const session = useSession()
 
-  useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('diagrams')
-        .select('*,shares(*)')
-        .order('created_at', { ascending: false })
+  const { data: diagrams, isLoading } = useGetDiagramsQuery()
+  const [createDiagram, { isLoading: isCreating }] = useCreateDiagramMutation()
 
-      const normalizedData = normalize(data, diagramArr)
-
-      dispatch(setDiagramById(normalizedData.entities.diagrams))
-      dispatch(setDiagramAllIds(normalizedData.result))
+  async function handleAddNew() {
+    if (!session) {
+      alert('Log in to create a new diagram')
+      return
     }
-    fetch()
-  }, [])
 
-  async function btnAddNewHandler() {
-    setIsCreating(true)
-    const { data, error } = await supabase
-      .from('diagrams')
-      .insert({
-        title: 'Untitled',
-        content: `@startuml\nBob->Alice: Hello\n@enduml`,
-        user_id: user.id,
-      })
-      .select('*,shares(*)')
-      .single()
-
-    if (error) {
-      let message = error.message
-      if (!user.id) {
-        message = 'Login to fully manage your diagrams'
-      }
-      alert(message)
-    } else {
-      dispatch(addDiagram(data))
+    try {
+      const data = await createDiagram().unwrap()
       router.push(`/${data.id}`)
+    } catch (err) {
+      if (isAxiosError(err) && err.response && err.response.status === 401) {
+        alert('Log in to create a new diagram')
+      } else {
+        alert('Unknown error')
+      }
     }
-    setIsCreating(false)
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -65,20 +43,20 @@ export default function DiagramList() {
           icon={<IconEdit size={20} />}
           text='New diagram'
           displayText
-          onClick={btnAddNewHandler}
+          onClick={handleAddNew}
           variant='secondary'
           className='w-full'
           loading={isCreating}
         />
       </div>
       <div className='h-[calc(100vh-120px)] space-y-2 overflow-y-auto'>
-        {diagramIds.length === 0 ? (
+        {!diagrams || diagrams.allIds.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-6  text-center text-slate-500'>
             <IconCategory size={40} strokeWidth={1.5} />
             <span className='text-sm'>No diagrams found</span>
           </div>
         ) : (
-          diagramIds.map((id: string) => <DiagramItem id={id} key={id} />)
+          diagrams.allIds.map((id: string) => <DiagramItem item={diagrams.byId[id]} key={id} />)
         )}
       </div>
     </div>

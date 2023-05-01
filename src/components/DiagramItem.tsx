@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase'
-import { deleteDiagram } from '@/stores/diagrams'
+import { useDeleteDiagramMutation } from '@/services/diagram'
+import { Diagram } from '@/types'
 import { IconTrashFilled } from '@tabler/icons-react'
 import cx from 'clsx'
 import { format, parseISO } from 'date-fns'
@@ -7,35 +7,32 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import plantumlEncoder from 'plantuml-encoder'
 import { useState, MouseEvent } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 
 interface DiagramItemProps {
-  id: string
+  item: Diagram
 }
 
-export default function DiagramItem({ id }: DiagramItemProps) {
+export default function DiagramItem({ item }: DiagramItemProps) {
+  const { content, title, id, created_at } = item
   const [showDeletionConfirm, setShowDeletionConfirm] = useState(false)
   const router = useRouter()
   const { slug } = router.query
   const isActive = slug ? id === slug[0] : false
-  const dispatch = useDispatch()
-  const diagram = useSelector((state: any) => state.diagrams.byId[id])
+  const [deleteDiagram] = useDeleteDiagramMutation()
 
-  const encodedUrl = plantumlEncoder.encode(diagram.content)
+  const encodedUrl = plantumlEncoder.encode(content)
 
-  function onClickTrashBtn(event: MouseEvent<HTMLButtonElement>) {
+  function handleClickTrashBtn(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation()
     event.preventDefault()
     setShowDeletionConfirm(true)
     setTimeout(() => setShowDeletionConfirm(false), 2000)
   }
 
-  async function onClickSureBtn(event: MouseEvent<HTMLButtonElement>) {
+  async function handleClickSureBtn(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation()
     event.preventDefault()
-    const { error } = await supabase.from('diagrams').delete().eq('id', id)
-    if (error) return
-    dispatch(deleteDiagram(diagram))
+    await deleteDiagram(id)
     if (isActive) {
       router.push('/')
     }
@@ -45,7 +42,7 @@ export default function DiagramItem({ id }: DiagramItemProps) {
     <Link
       href={`/${id}`}
       className={cx(
-        isActive ? 'border-slate-200 bg-slate-100' : 'border-transparent',
+        isActive ? 'border-slate-300 bg-slate-100' : 'border-transparent',
         'block cursor-pointer rounded border p-1 hover:bg-slate-100'
       )}>
       <div className='flex items-center justify-between gap-2'>
@@ -54,25 +51,24 @@ export default function DiagramItem({ id }: DiagramItemProps) {
             <img
               src={`https://usediagram.com/api/png/${encodedUrl}`}
               className='h-12 w-12 object-cover p-0.5'
+              alt='Diagram Thumbnail'
             />
           </div>
           <div className='truncate'>
-            <h2 className='truncate text-sm font-medium'>{diagram.title}</h2>
+            <h2 className='truncate text-sm font-medium'>{title}</h2>
             <div className='flex gap-2'>
-              <div className='text-xs text-slate-400'>
-                {format(parseISO(diagram.created_at), 'MMM dd, yyyy')}
-              </div>
+              <div className='text-xs text-slate-400'>{format(parseISO(created_at), 'MMM dd, yyyy')}</div>
             </div>
           </div>
         </div>
         <div>
           {!showDeletionConfirm && (
-            <button className='text-slate-400 hover:text-slate-900' onClick={onClickTrashBtn}>
+            <button className='text-slate-400 hover:text-slate-900' onClick={handleClickTrashBtn}>
               {<IconTrashFilled size={16} />}
             </button>
           )}
           {showDeletionConfirm && (
-            <button className='text-xs text-red-600 hover:underline' onClick={onClickSureBtn}>
+            <button className='text-xs text-red-600 hover:underline' onClick={handleClickSureBtn}>
               Sure?
             </button>
           )}

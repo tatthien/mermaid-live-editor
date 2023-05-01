@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { IconLoader } from '@tabler/icons-react'
 import cx from 'clsx'
 import Link from 'next/link'
@@ -9,6 +9,7 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [successfulMsg, setSuccessfulMsg] = useState('')
+  const supabase = useSupabaseClient()
 
   async function onSubmit(event: any) {
     event.preventDefault()

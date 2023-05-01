@@ -76,7 +76,3 @@
 .Resizer.disabled:hover {
   border-color: transparent;
 }
-
-pre {
-  @apply mb-4 mt-1 rounded border border-orange-300 bg-orange-200 p-3 text-orange-700;
-}
