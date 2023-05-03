@@ -4,9 +4,9 @@ import Editor from '@/components/Editor'
 import Header from '@/components/Header'
 import Preview from '@/components/Preview'
 import Sidebar from '@/components/Sidebar'
+import { useDiagrams } from '@/hooks/useDiagrams'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
-import { useAppSelector } from '@/hooks/useStore'
-import { useGetDiagramQuery, useUpdateDiagramMutation } from '@/services/diagram'
+import { Diagram } from '@/types'
 import { Allotment } from 'allotment'
 import cx from 'clsx'
 import { debounce } from 'lodash'
@@ -25,13 +25,21 @@ export default function Home() {
   const [content, setContent] = useState('')
   const [path, setPath] = useState('')
   const [modelContent, setModelContent] = useState('')
+  const [diagram, setDiagram] = useState<Diagram>()
   const { showSidebar, showDiagramList } = useGlobalUI()
-  const [updateDiagram] = useUpdateDiagramMutation()
-  const { data: diagram, isError } = useGetDiagramQuery(id)
+  const { diagrams, mutate } = useDiagrams()
 
-  if (isError && id) {
-    router.push('/404')
-  }
+  useEffect(() => {
+    console.log('>>>>', slug)
+    if (!diagrams?.length || !id || !router.isReady) return
+
+    const diagram = diagrams?.find((item) => item.id === id)
+    if (diagram) {
+      setDiagram(diagram)
+    } else {
+      router.push('/404')
+    }
+  }, [diagrams, router, id, slug])
 
   useEffect(() => {
     if (diagram) {
@@ -44,11 +52,35 @@ export default function Home() {
     setContent(String(value))
 
     if (id) {
-      await updateDiagram({ id, content: value })
+      const updatedItem = { ...diagram, content: value }
+      mutate(
+        (data: any) => {
+          return data.map((item: Diagram) => (item.id === updatedItem.id ? updatedItem : item))
+        },
+        {
+          revalidate: false,
+        }
+      )
+
+      const res = await fetch(`/api/diagrams/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: value,
+        }),
+      })
+
+      if (!res.ok) {
+        mutate((data: any) => {
+          return data.map((item: Diagram) => (item.id === diagram?.id ? diagram : item))
+        })
+      }
     }
   }
 
-  const handleEditorChange = debounce(onChange, 300)
+  const handleEditorChange = debounce(onChange, 400)
 
   async function handleMessage(value: string) {
     setModelContent(value)

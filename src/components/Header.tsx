@@ -1,11 +1,12 @@
 import ActionButton from '@/components/ActionButton'
+import { useDiagrams } from '@/hooks/useDiagrams'
 import { useGlobalUI } from '@/hooks/useGlobalUI'
-import { useUpdateDiagramMutation } from '@/services/diagram'
 import { Diagram } from '@/types'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { IconMenu2 } from '@tabler/icons-react'
 import Link from 'next/link'
-import { FocusEvent, FormEvent, KeyboardEvent, useEffect, useState } from 'react'
+import { FocusEvent, KeyboardEvent, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 interface HeaderProps {
   diagram?: Diagram
@@ -16,7 +17,7 @@ export default function Header({ diagram }: HeaderProps) {
   const supabase = useSupabaseClient()
   const { toggleDiagramList } = useGlobalUI()
   const [title, setTitle] = useState('')
-  const [updateDiagram] = useUpdateDiagramMutation()
+  const { mutate } = useDiagrams()
 
   useEffect(() => {
     if (!diagram) return
@@ -32,22 +33,42 @@ export default function Header({ diagram }: HeaderProps) {
     if (event.keyCode === 13) {
       event.preventDefault()
       event.currentTarget.blur()
-      const title = event.currentTarget.textContent || 'Untitled'
-      setTitle(title)
-      await updateDiagram({
-        id: diagram?.id,
-        title,
-      })
     }
   }
 
   async function handleBlur(event: FocusEvent<HTMLSpanElement>) {
     const title = event.currentTarget.textContent || 'Untitled'
     setTitle(title)
-    await updateDiagram({
-      id: diagram?.id,
-      title,
-    })
+    if (diagram) {
+      const updatedItem = { ...diagram, title }
+      mutate(
+        (data: any) => {
+          return data.map((item: Diagram) => (item.id === updatedItem.id ? updatedItem : item))
+        },
+        {
+          revalidate: false,
+        }
+      )
+
+      const res = await fetch(`/api/diagrams/${diagram.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+        }),
+      })
+
+      if (!res.ok) {
+        // Rollback on error
+        mutate((data: any) => {
+          return data.map((item: Diagram) => (item.id === diagram.id ? diagram : item))
+        })
+
+        toast.error('Cannot update diagram title')
+      }
+    }
   }
 
   return (

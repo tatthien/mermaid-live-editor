@@ -4,7 +4,10 @@ import Link from 'next/link'
 export default function NotFound() {
   return (
     <div className='flex h-screen flex-col items-center justify-center bg-slate-50'>
-      <div className='mb-4 text-xl font-medium'>usediagram.com</div>
+      <div className='mb-4 text-center text-xl font-medium'>
+        <img src='/logo.svg' alt='Logo' className='mx-auto mb-2 w-10' />
+        <Link href='/'>usediagram.com</Link>
+      </div>
       <div className='w-[350px] max-w-[350px] rounded-md border bg-white p-4 shadow-md'>
         <div className='mb-4'>
           The resource you are looking for has been removed, had its name changed, or is temporarily

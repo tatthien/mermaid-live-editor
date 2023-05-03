@@ -1,34 +1,41 @@
-import { useCreateDiagramMutation, useGetDiagramsQuery } from '@/services/diagram'
+import { useDiagrams } from '@/hooks/useDiagrams'
+import { Diagram } from '@/types'
 import { useSession } from '@supabase/auth-helpers-react'
 import { IconCategory, IconEdit } from '@tabler/icons-react'
-import { isAxiosError } from 'axios'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import ActionButton from './ActionButton'
 import DiagramItem from './DiagramItem'
 
 export default function DiagramList() {
+  const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
   const session = useSession()
-
-  const { data: diagrams, isLoading } = useGetDiagramsQuery()
-  const [createDiagram, { isLoading: isCreating }] = useCreateDiagramMutation()
+  const { diagrams, isLoading, mutate } = useDiagrams()
 
   async function handleAddNew() {
     if (!session) {
-      alert('Log in to create a new diagram')
+      toast.error('Log in to create a new diagram')
       return
     }
 
     try {
-      const data = await createDiagram().unwrap()
-      router.push(`/${data.id}`)
+      setIsCreating(true)
+      const res = await fetch(`/api/diagrams`, {
+        method: 'POST',
+      })
+      const json = await res.json()
+      await mutate((data) => {
+        if (!data) return data
+        return [json, ...data]
+      }, false)
+      router.push(`/${json.id}`)
     } catch (err) {
-      if (isAxiosError(err) && err.response && err.response.status === 401) {
-        alert('Log in to create a new diagram')
-      } else {
-        alert('Unknown error')
-      }
+      toast.error('Cannot add a new diagram')
+    } finally {
+      setIsCreating(false)
     }
   }
 
@@ -50,13 +57,13 @@ export default function DiagramList() {
         />
       </div>
       <div className='h-[calc(100vh-120px)] space-y-2 overflow-y-auto'>
-        {!diagrams || diagrams.allIds.length === 0 ? (
+        {!diagrams?.length ? (
           <div className='flex flex-col items-center justify-center py-6  text-center text-slate-500'>
             <IconCategory size={40} strokeWidth={1.5} />
             <span className='text-sm'>No diagrams found</span>
           </div>
         ) : (
-          diagrams.allIds.map((id: string) => <DiagramItem item={diagrams.byId[id]} key={id} />)
+          diagrams.map((diagram: Diagram) => <DiagramItem item={diagram} key={diagram.id} mutate={mutate} />)
         )}
       </div>
     </div>

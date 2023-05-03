@@ -13,13 +13,14 @@ import axios from 'axios'
 import DOMPurify from 'dompurify'
 import plantumlEncoder from 'plantuml-encoder'
 import { useRef, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
-interface IPreviewProps {
+interface PreviewProps {
   content: string
 }
 
-export default function Preview({ content }: IPreviewProps) {
+export default function Preview({ content }: PreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
   const [isDownloadingPng, setIsDownloadingPng] = useState(false)
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
@@ -28,20 +29,25 @@ export default function Preview({ content }: IPreviewProps) {
   useEffect(() => {
     if (!previewRef.current) return
     if (content) {
-      const encodedUrl = plantumlEncoder.encode(content)
-      setIsGeneratingPreview(true)
-      axios
-        .get(`/api/svg/${encodedUrl}`)
-        .then((res) => {
-          const html = DOMPurify.sanitize(res.data.data)
-          if (previewRef.current !== null) {
-            previewRef.current.innerHTML = html
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally(() => setIsGeneratingPreview(false))
+      // prettier-ignore
+      (async () => {
+        // code goes here
+        const encodedUrl = plantumlEncoder.encode(content)
+        setIsGeneratingPreview(true)
+        const res = await fetch(`/api/svg/${encodedUrl}`)
+        if (!res.ok) {
+          toast.dismiss()
+          toast.error('Make sure the syntax is correct')
+          setIsGeneratingPreview(false)
+          return
+        }
+        const json = await res.json()
+        const html = DOMPurify.sanitize(json.data)
+        if (previewRef.current !== null) {
+          previewRef.current.innerHTML = html
+        }
+        setIsGeneratingPreview(false)
+      })()
     } else {
       previewRef.current.innerHTML = ''
     }

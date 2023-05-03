@@ -1,5 +1,4 @@
 import GlobalUIProvider from '@/components/GlobalUIProvider'
-import { store } from '@/stores'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { Analytics } from '@vercel/analytics/react'
@@ -7,7 +6,7 @@ import 'allotment/dist/style.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useState } from 'react'
-import { Provider } from 'react-redux'
+import { Toaster } from 'react-hot-toast'
 
 import '../styles/globals.css'
 
@@ -40,11 +39,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name='twitter:description' content={description} />
       </Head>
       <SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
-        <Provider store={store}>
-          <GlobalUIProvider>
-            <Component {...pageProps} />
-          </GlobalUIProvider>
-        </Provider>
+        <GlobalUIProvider>
+          <Component {...pageProps} />
+        </GlobalUIProvider>
+        <Toaster position='top-center' reverseOrder={false} />
       </SessionContextProvider>
       <Analytics />
     </>

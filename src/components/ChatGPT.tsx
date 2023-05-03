@@ -1,6 +1,7 @@
 import { IconSparkles, IconLoader, IconCircleKeyFilled, IconSettings, IconCircleX } from '@tabler/icons-react'
 import axios, { isAxiosError } from 'axios'
 import { useState, KeyboardEvent, useRef, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 
 import ActionButton from './ActionButton'
 
@@ -107,9 +108,9 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
       } catch (err) {
         if (isAxiosError(err) && err.response) {
           if (err.status) {
-            alert('Wrong API key!')
+            toast.error('Wrong API key')
           } else {
-            alert(err.response.data.error.message)
+            toast.error(err.response.data.error.message)
           }
         }
       }
@@ -142,12 +143,13 @@ export default function ChatGPT({ onMessage, content }: ChatGPTProps) {
       localStorage.setItem('UD_apiKey', key)
       setApiKey(key)
       setIsEditingKey(false)
+      toast.success('API key added successfully')
     } catch (err) {
       if (isAxiosError(err) && err.response) {
         if (err.response.status === 401) {
-          alert('Wrong API key!')
+          toast.error('Wrong API key')
         } else {
-          alert('Opps! Something went wrong')
+          toast.error('Opps! Something went wrong')
         }
       }
     }

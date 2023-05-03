@@ -1,4 +1,4 @@
-import { useDeleteDiagramMutation } from '@/services/diagram'
+import { useDiagrams } from '@/hooks/useDiagrams'
 import { Diagram } from '@/types'
 import { IconTrashFilled } from '@tabler/icons-react'
 import cx from 'clsx'
@@ -7,18 +7,21 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import plantumlEncoder from 'plantuml-encoder'
 import { useState, MouseEvent } from 'react'
+import { toast } from 'react-hot-toast'
+import { KeyedMutator } from 'swr'
 
 interface DiagramItemProps {
   item: Diagram
+  mutate: KeyedMutator<Diagram[]>
 }
 
-export default function DiagramItem({ item }: DiagramItemProps) {
+export default function DiagramItem({ item, mutate }: DiagramItemProps) {
   const { content, title, id, created_at } = item
   const [showDeletionConfirm, setShowDeletionConfirm] = useState(false)
   const router = useRouter()
   const { slug } = router.query
   const isActive = slug ? id === slug[0] : false
-  const [deleteDiagram] = useDeleteDiagramMutation()
+  const { diagrams } = useDiagrams()
 
   const encodedUrl = plantumlEncoder.encode(content)
 
@@ -32,7 +35,23 @@ export default function DiagramItem({ item }: DiagramItemProps) {
   async function handleClickSureBtn(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation()
     event.preventDefault()
-    await deleteDiagram(id)
+
+    // Revalidate
+    const updatedDiagrams = diagrams?.filter((diagram: Diagram) => diagram.id !== id)
+    mutate(updatedDiagrams, {
+      revalidate: false,
+    })
+
+    // Delete item
+    const res = await fetch(`/api/diagrams/${id}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) {
+      mutate(diagrams)
+      toast.error('Cannot delete this diagram')
+    }
+
     if (isActive) {
       router.push('/')
     }
