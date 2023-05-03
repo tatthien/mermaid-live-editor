@@ -108,6 +108,28 @@ Bus o-down- Driver
   },
   {
     type: 'option',
+    key: 'mindmap',
+    title: 'Mindmap',
+    value: `@startmindmap
+
+skinparam backgroundColor transparent
+
+* JAMStack
+** Site generator
+*** Next.js
+*** Hugo
+*** Gatsby
+*** Docusaurus
+** Headless CMS
+*** Strapi
+*** Directus
+*** Payload CMS
+
+@endmindmap
+`,
+  },
+  {
+    type: 'option',
     key: 'yaml',
     title: 'YAML',
     value: `@startyaml
