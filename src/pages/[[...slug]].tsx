@@ -30,7 +30,6 @@ export default function Home() {
   const { diagrams, mutate } = useDiagrams()
 
   useEffect(() => {
-    console.log('>>>>', slug)
     if (!diagrams?.length || !id || !router.isReady) return
 
     const diagram = diagrams?.find((item) => item.id === id)
@@ -39,7 +38,7 @@ export default function Home() {
     } else {
       router.push('/404')
     }
-  }, [diagrams, router, id, slug])
+  }, [diagrams, router, id])
 
   useEffect(() => {
     if (diagram) {
@@ -102,12 +101,14 @@ export default function Home() {
           <Allotment>
             <Allotment.Pane visible={showSidebar} preferredSize={450}>
               <Sidebar>
-                <Editor
-                  content={content}
-                  modelContent={modelContent}
-                  path={path}
-                  onChange={handleEditorChange}
-                />
+                <>
+                  <Editor
+                    content={content}
+                    modelContent={modelContent}
+                    path={path}
+                    onChange={handleEditorChange}
+                  />
+                </>
               </Sidebar>
             </Allotment.Pane>
             <Allotment.Pane>

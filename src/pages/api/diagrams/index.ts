@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .from('diagrams')
       .insert({
         title: 'Untitled',
-        content: `@startuml\nBob->Alice: Hello\n@enduml`,
+        content: req.body.content,
         user_id: user?.id,
       })
       .select('*,shares(*)')
